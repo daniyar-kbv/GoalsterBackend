@@ -93,14 +93,9 @@ class GoalAddSerializer(serializers.ModelSerializer):
 
 
 class UserAnswerListSerializer(serializers.ModelSerializer):
-    question = serializers.SerializerMethodField()
-
     class Meta:
         model = UserAnswer
-        fields = ['id', 'question', 'answer']
-
-    def get_question(self, obj):
-        return obj.question.name
+        fields = ['question', 'answer']
 
 
 class UserAnswerAddSerializer(serializers.ModelSerializer):
@@ -110,7 +105,7 @@ class UserAnswerAddSerializer(serializers.ModelSerializer):
 
 
 class AddEmotionSerializer(serializers.Serializer):
-    answers = serializers.ListField(child=serializers.CharField())
+    answers = serializers.ListField(child=UserAnswerAddSerializer())
 
     def validate_answers(self, value):
         if len(value) != 4:
@@ -118,12 +113,18 @@ class AddEmotionSerializer(serializers.Serializer):
         return value
 
     def create(self, validated_data):
-        UserAnswer.objects.all().delete()
-        serializer = UserAnswerAddSerializer(**validated_data)
-        if serializer.is_valid():
-            serializer.save(user=self.context.get('user'))
-        else:
-            raise serializers.ValidationError(response.make_errors(serializer))
+        UserAnswer.objects.filter(user=self.context.get('user')).delete()
+        answers = validated_data.get('answers')
+        answer_objects = []
+        for answer in answers:
+            serializer = UserAnswerAddSerializer(data=answer)
+            if serializer.is_valid():
+                answer_objects.append(serializer.save(user=self.context.get('user')))
+            else:
+                for obj in answer_objects:
+                    obj.delete()
+                raise serializers.ValidationError(response.make_errors(serializer))
+        return answer_objects
 
 
 class VisualizationCreateSerializer(serializers.ModelSerializer):

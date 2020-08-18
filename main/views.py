@@ -208,7 +208,7 @@ class EmotionsViewSet(viewsets.GenericViewSet,
     serializer_class = UserAnswerListSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = UserAnswer.objects.filter(user=request.user).order_by('question__position')
+        queryset = UserAnswer.objects.filter(user=request.user)
         serializer = self.get_serializer(queryset, many=True)
         return Response({
             'emotions': serializer.data
