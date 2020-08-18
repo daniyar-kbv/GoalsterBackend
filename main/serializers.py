@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from main.models import SelectedSphere, Goal, Observation, Question, UserAnswer, Visualization, Help
+from main.models import SelectedSphere, Goal, Observation, UserAnswer, Visualization, Help
 from users.models import MainUser
 from utils import response
 import constants
@@ -92,12 +92,6 @@ class GoalAddSerializer(serializers.ModelSerializer):
         return goal
 
 
-class QuestionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Question
-        fields = ('id', 'name', 'placeholder')
-
-
 class UserAnswerListSerializer(serializers.ModelSerializer):
     question = serializers.SerializerMethodField()
 
@@ -113,33 +107,23 @@ class UserAnswerAddSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAnswer
         fields = '__all__'
-        read_only_fields = ['question']
 
 
 class AddEmotionSerializer(serializers.Serializer):
     answers = serializers.ListField(child=serializers.CharField())
 
     def validate_answers(self, value):
-        if len(value) != Question.objects.count():
+        if len(value) != 4:
             raise serializers.ValidationError(response.make_messages([_('Number of answers should be equal to 4')]))
         return value
 
     def create(self, validated_data):
         UserAnswer.objects.all().delete()
-        for index, answer in enumerate(validated_data.get('answers')):
-            data = {
-                'answer': answer
-            }
-            serializer = UserAnswerAddSerializer(data=data)
-            try:
-                question = Question.objects.get(position=index + 1)
-            except:
-                raise serializers.ValidationError(response.make_messages([f"{_('Question')} {_('Does not exist')}"]))
-            if serializer.is_valid():
-                serializer.save(user=self.context.get('user'), question=question)
-            else:
-                raise serializers.ValidationError(response.make_errors(serializer))
-        return validated_data.get('answers')
+        serializer = UserAnswerAddSerializer(**validated_data)
+        if serializer.is_valid():
+            serializer.save(user=self.context.get('user'))
+        else:
+            raise serializers.ValidationError(response.make_errors(serializer))
 
 
 class VisualizationCreateSerializer(serializers.ModelSerializer):

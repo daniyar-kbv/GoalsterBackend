@@ -122,24 +122,8 @@ class Visualization(models.Model):
         image.save(self.image.path, quality=20, optimize=True)
 
 
-class Question(models.Model):
-    name = models.CharField(_('Name'), max_length=500)
-    placeholder = models.CharField(_('Placeholder'), null=True, max_length=500)
-    position = models.IntegerField(_('Position'))
-
-    class Meta:
-        verbose_name = _('Question')
-        verbose_name_plural = _('Questions')
-
-    def __str__(self):
-        return f'{self.id}: {self.name}'
-
-
 class UserAnswer(models.Model):
-    question = models.ForeignKey(Question,
-                                 on_delete=models.CASCADE,
-                                 related_name='answers',
-                                 verbose_name=_('Question'))
+    question = models.CharField(_('Question'), max_length=500)
     user = models.ForeignKey(MainUser,
                              on_delete=models.CASCADE,
                              related_name='answers',

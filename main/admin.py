@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import Goal, Observation, Question, Help, SelectedSphere
+from main.models import Goal, Observation, Help, SelectedSphere
 
 
 class ObservationInline(admin.StackedInline):
@@ -12,11 +12,6 @@ class GoalAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'date', 'time', 'is_done', 'is_shared')
     inlines = [ObservationInline]
     search_fields = ['name']
-
-
-@admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'position')
 
 
 @admin.register(Help)

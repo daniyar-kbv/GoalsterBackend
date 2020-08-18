@@ -4,9 +4,9 @@ from rest_framework import viewsets, mixins
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from main.models import Goal, Observation, Visualization, Question, UserAnswer, SelectedSphere, Help
-from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAddSerializer, \
-    QuestionSerializer, AddEmotionSerializer, UserAnswerListSerializer, VisualizationCreateSerializer, \
+from main.models import Goal, Observation, Visualization, UserAnswer, SelectedSphere, Help
+from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAddSerializer, AddEmotionSerializer, \
+    UserAnswerListSerializer, VisualizationCreateSerializer, \
     VisualizationListSerializer, SelectedSphereSerializer, ObservedListSerializer, ObserversListSerializer, \
     ObservationAcceptSerializer, HelpCreateSerializer
 from utils import permissions, response
@@ -199,26 +199,6 @@ class VisualizationViewSet(viewsets.GenericViewSet,
             serializer.save(user=request.user)
             return Response()
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
-
-
-class QuestionViewSet(viewsets.GenericViewSet,
-                      mixins.ListModelMixin):
-    queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
-    pagination_class = None
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response({
-            'questions': serializer.data
-        })
 
 
 class EmotionsViewSet(viewsets.GenericViewSet,
