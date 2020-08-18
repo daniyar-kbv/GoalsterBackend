@@ -95,7 +95,7 @@ class GoalAddSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'placeholder')
 
 
 class UserAnswerListSerializer(serializers.ModelSerializer):
