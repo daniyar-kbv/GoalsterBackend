@@ -60,4 +60,6 @@ services:
 
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:
   rabbit:
