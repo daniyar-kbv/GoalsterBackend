@@ -47,7 +47,7 @@ services:
     links:
       - db
     env_file:
-    - ./.env.dev
+    - ./.env.prod
   nginx:
     build: ./nginx
     volumes:
