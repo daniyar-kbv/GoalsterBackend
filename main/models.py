@@ -124,7 +124,7 @@ class Visualization(models.Model):
 
 class Question(models.Model):
     name = models.CharField(_('Name'), max_length=500)
-    placeholder = models.CharField(_('Placeholder'), max_length=500)
+    placeholder = models.CharField(_('Placeholder'), null=True, max_length=500)
     position = models.IntegerField(_('Position'))
 
     class Meta:
