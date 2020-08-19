@@ -191,7 +191,9 @@ class VisualizationViewSet(viewsets.GenericViewSet,
                 'name': sphere.sphere,
                 'visualizations': serializer.data
             })
-        return Response(data)
+        return Response({
+            'spheres': data
+        })
 
     def create(self, request, *args, **kwargs):
         serializer = VisualizationCreateSerializer(data=request.data)
