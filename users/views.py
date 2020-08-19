@@ -11,6 +11,7 @@ from users.serializers import UserSendActivationEmailSerializer, UserShortSerial
     ChangeNotificationsSerializer
 from main.tasks import after_three_days
 from main.models import SelectedSphere
+from main.serializers import SelectedSphereSerializer
 from utils import encryption, response, permissions
 import constants, datetime
 
@@ -83,8 +84,11 @@ class UserViewSet(viewsets.GenericViewSet,
         user.last_activity = timezone.now()
         after_three_days.apply_async(args=[user.id], eta=timezone.now() + datetime.timedelta(days=3))
         user.save()
+        queryset = SelectedSphere.objects.filter(user=request.user)
+        spheres_serializer = SelectedSphereSerializer(queryset, many=True)
         data = {
-            'hasSpheres': SelectedSphere.objects.filter(user=request.user).count() == 3
+            'hasSpheres': SelectedSphere.objects.filter(user=request.user).count() == 3,
+            'spheres': spheres_serializer.data
         }
         return Response(data)
 

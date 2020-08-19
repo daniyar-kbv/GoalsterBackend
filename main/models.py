@@ -110,14 +110,15 @@ class Visualization(models.Model):
             if ExifTags.TAGS[orientation] == 'Orientation':
                 break
 
-        exif = dict(image._getexif().items())
+        if image._getexif():
+            exif = dict(image._getexif().items())
 
-        if exif[orientation] == 3:
-            image = image.rotate(180, expand=True)
-        elif exif[orientation] == 6:
-            image = image.rotate(270, expand=True)
-        elif exif[orientation] == 8:
-            image = image.rotate(90, expand=True)
+            if exif[orientation] == 3:
+                image = image.rotate(180, expand=True)
+            elif exif[orientation] == 6:
+                image = image.rotate(270, expand=True)
+            elif exif[orientation] == 8:
+                image = image.rotate(90, expand=True)
 
         image.save(self.image.path, quality=20, optimize=True)
 

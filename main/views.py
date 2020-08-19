@@ -188,7 +188,7 @@ class VisualizationViewSet(viewsets.GenericViewSet,
             visualizations = Visualization.objects.filter(user=request.user, sphere=sphere)
             serializer = VisualizationListSerializer(visualizations, many=True, context=request)
             data.append({
-                'name': sphere.sphere.name,
+                'name': sphere.sphere,
                 'visualizations': serializer.data
             })
         return Response(data)
