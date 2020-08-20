@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.db.models import Q
 from django.shortcuts import redirect
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
@@ -88,7 +89,7 @@ class UserViewSet(viewsets.GenericViewSet,
             'hasSpheres': SelectedSphere.objects.filter(user=request.user).count() == 3,
             'email': user.email,
             'isPremium': user.is_premium,
-            'notConfirmedCount': Observation.objects.filter(observer=request.user, is_confirmed=None).distinct('observer').count()
+            'notConfirmedCount': Observation.objects.filter(Q(observer=request.user) & Q(Q(is_confirmed=None) | Q(is_confirmed=True))).distinct('observer').count()
         }
         return Response(data)
 
