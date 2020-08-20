@@ -45,7 +45,7 @@ msgid "Time of the day"
 msgstr "Время дня"
 
 msgid "Is done"
-msgstr "Is shared"
+msgstr "Сделано"
 
 msgid "Goal"
 msgstr "Цель"

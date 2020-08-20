@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.db.models import Q
 from rest_framework import viewsets, mixins
 from rest_framework import status
 from rest_framework.response import Response
@@ -234,7 +235,7 @@ class ObservationViewSet(viewsets.GenericViewSet,):
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def observed(self, request, pk=None):
-        queryset = Observation.objects.filter(observer=request.user, is_confirmed__in=[None, True]).distinct('observer')
+        queryset = Observation.objects.filter(Q(observer=request.user) & Q(Q(is_confirmed=None) | Q(is_confirmed=True))).distinct('observer')
         serializer = ObservedListSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -254,7 +255,7 @@ class ObservationViewSet(viewsets.GenericViewSet,):
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def observers(self, request, pk=None):
-        queryset = Observation.objects.filter(observed=request.user, is_confirmed__in=[None, True]).distinct('observed')
+        queryset = Observation.objects.filter(Q(observed=request.user) & Q(Q(is_confirmed=None) | Q(is_confirmed=True))).distinct('observer')
         serializer = ObserversListSerializer(queryset, many=True)
         return Response(serializer.data)
 

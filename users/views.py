@@ -10,7 +10,7 @@ from users.models import MainUser, UserActivation
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
     ChangeNotificationsSerializer
 from main.tasks import after_three_days
-from main.models import SelectedSphere
+from main.models import SelectedSphere, Observation
 from main.serializers import SelectedSphereSerializer
 from utils import encryption, response, permissions
 import constants, datetime
@@ -87,7 +87,8 @@ class UserViewSet(viewsets.GenericViewSet,
         data = {
             'hasSpheres': SelectedSphere.objects.filter(user=request.user).count() == 3,
             'email': user.email,
-            'isPremium': user.is_premium
+            'isPremium': user.is_premium,
+            'notConfirmedCount': Observation.objects.filter(observer=request.user, is_confirmed=None).distinct('observer').count()
         }
         return Response(data)
 
