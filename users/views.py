@@ -86,7 +86,8 @@ class UserViewSet(viewsets.GenericViewSet,
         user.save()
         data = {
             'hasSpheres': SelectedSphere.objects.filter(user=request.user).count() == 3,
-            'email': user.email
+            'email': user.email,
+            'isPremium': user.is_premium
         }
         return Response(data)
 
