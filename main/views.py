@@ -63,7 +63,7 @@ class GoalViewSet(viewsets.GenericViewSet,
             date = timezone.now().date()
         queryset = queryset.filter(date=date)
         context = {
-            'user': request.user
+            'user': user
         }
         morning_serializer = GoalListSerializer(queryset.filter(time=constants.TIME_MORNING).order_by('created_at'),
                                                  many=True, context=context)
