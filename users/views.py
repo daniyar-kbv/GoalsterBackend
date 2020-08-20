@@ -85,7 +85,8 @@ class UserViewSet(viewsets.GenericViewSet,
         after_three_days.apply_async(args=[user.id], eta=timezone.now() + datetime.timedelta(days=3))
         user.save()
         data = {
-            'hasSpheres': SelectedSphere.objects.filter(user=request.user).count() == 3
+            'hasSpheres': SelectedSphere.objects.filter(user=request.user).count() == 3,
+            'email': user.email
         }
         return Response(data)
 
