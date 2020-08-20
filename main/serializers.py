@@ -145,15 +145,37 @@ class VisualizationListSerializer(serializers.ModelSerializer):
         return self.context.build_absolute_uri(obj.image.url)
 
 
+class SelectedSpheresObservedSerializer(serializers.ModelSerializer):
+    count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SelectedSphere
+        fields = ['sphere', 'count']
+
+    def get_count(self, obj):
+        return Goal.objects.filter(user=obj.user, is_done=True, sphere=obj).count()
+
+
 class ObservedListSerializer(serializers.ModelSerializer):
     observed = serializers.SerializerMethodField()
+    spheres = serializers.SerializerMethodField()
 
     class Meta:
         model = Observation
-        fields = ['id', 'observed', 'is_confirmed']
+        fields = ['id', 'observed', 'is_confirmed', 'spheres']
 
     def get_observed(self, obj):
         return obj.observed.email
+
+    def get_spheres(self, obj):
+        string = ''
+        spheres = SelectedSphere.objects.filter(user=obj.observed)
+        for index, sphere in enumerate(spheres):
+            count = Goal.objects.filter(user=obj.observed, is_done=True, sphere=sphere).count()
+            string += f'{sphere.sphere} ({count})'
+            if index != spheres.count() - 1:
+                string += ', '
+        return string
 
 
 class ObserversListSerializer(serializers.ModelSerializer):

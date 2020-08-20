@@ -148,7 +148,6 @@ class GoalViewSet(viewsets.GenericViewSet,
         context = {
             'user': request.user
         }
-        print(queryset.filter(time=constants.TIME_DAY).order_by('created_at'))
         morning_serializer = GoalListSerializer(queryset.filter(time=constants.TIME_MORNING).order_by('created_at'),
                                                  many=True, context=context)
         day_serializer = GoalListSerializer(queryset.filter(time=constants.TIME_DAY).order_by('created_at'),
@@ -237,7 +236,9 @@ class ObservationViewSet(viewsets.GenericViewSet,):
     def observed(self, request, pk=None):
         queryset = Observation.objects.filter(Q(observer=request.user) & Q(Q(is_confirmed=None) | Q(is_confirmed=True))).distinct('observer')
         serializer = ObservedListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({
+            'observed': serializer.data
+        })
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def accept(self, request, pk=None):
@@ -257,7 +258,9 @@ class ObservationViewSet(viewsets.GenericViewSet,):
     def observers(self, request, pk=None):
         queryset = Observation.objects.filter(Q(observed=request.user) & Q(Q(is_confirmed=None) | Q(is_confirmed=True))).distinct('observer')
         serializer = ObserversListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({
+            'observers': serializer.data
+        })
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def remove(self, request, pk=None):
