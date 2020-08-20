@@ -46,10 +46,11 @@ class ChooseSpheresSerializer(serializers.Serializer):
 class GoalListSerializer(serializers.ModelSerializer):
     observer = serializers.SerializerMethodField()
     sphere = serializers.SerializerMethodField()
+    is_confirmed = serializers.SerializerMethodField()
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'time', 'is_done', 'observer', 'sphere')
+        fields = ('id', 'name', 'time', 'is_done', 'observer', 'is_confirmed','sphere')
 
     def get_observer(self, obj):
         try:
@@ -63,6 +64,13 @@ class GoalListSerializer(serializers.ModelSerializer):
             if sphere == obj.sphere:
                 return index + 1
         return None
+
+    def get_is_confirmed(self, obj):
+        try:
+            observation = Observation.objects.get(goal=obj)
+        except:
+            return None
+        return observation.is_confirmed
 
 
 class GoalAddSerializer(serializers.ModelSerializer):
