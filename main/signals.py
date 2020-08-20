@@ -21,6 +21,9 @@ def sphere_saved(sender, instance, created=True, **kwargs):
 @receiver(post_save, sender=Observation)
 def observation_saved(sender, instance, created=True, **kwargs):
     if instance:
+        if created:
+            instance.observed = instance.goal.user
+            instance.save()
         attrs_needed = ['_request', '_created']
         if all(hasattr(instance, attr) for attr in attrs_needed):
             if instance._created:

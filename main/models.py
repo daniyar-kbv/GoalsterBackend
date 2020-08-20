@@ -54,7 +54,9 @@ class Observation(models.Model):
     observed = models.ForeignKey(MainUser,
                                  on_delete=models.CASCADE,
                                  related_name='observers',
-                                 verbose_name=_('Observed'))
+                                 verbose_name=_('Observed'),
+                                 null=True,
+                                 blank=True)
     observer = models.ForeignKey(MainUser,
                                  on_delete=models.CASCADE,
                                  related_name='observed',

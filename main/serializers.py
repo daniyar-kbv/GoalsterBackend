@@ -85,7 +85,7 @@ class GoalAddSerializer(serializers.ModelSerializer):
             except:
                 goal.delete()
                 raise serializers.ValidationError(response.make_messages([f'{_("Observer")} {_("Does not exist")}']))
-            observation = Observation.objects.create(observed=user, observer=observer, goal=goal)
+            observation = Observation.objects.create(observer=observer, goal=goal)
             observation._request = self.context.get('request')
             observation._created = True
             observation.save()

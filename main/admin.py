@@ -5,6 +5,7 @@ from main.models import Goal, Observation, Help, SelectedSphere
 class ObservationInline(admin.StackedInline):
     model = Observation
     extra = 0
+    fields = ['observer', 'is_confirmed']
 
 
 @admin.register(Goal)
