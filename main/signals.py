@@ -37,9 +37,9 @@ def observation_saved(sender, instance, created=True, **kwargs):
 @receiver(post_save, sender=UserAnswer)
 def answer_saved(sender, instance, created=True, **kwargs):
     if created:
-        next_day = instance.created_at + datetime.timedelta(minutes=1)
-        # next_day_start = next_day.replace(hour=0, minute=0, second=0)
-        delete_emoton.apply_async(args=[instance.id], eta=next_day)
+        next_day = instance.created_at + datetime.timedelta(days=1)
+        next_day_start = next_day.replace(hour=0, minute=0, second=0)
+        delete_emoton.apply_async(args=[instance.id], eta=next_day_start)
 
 
 @receiver(pre_delete, sender=Visualization)
