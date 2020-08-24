@@ -103,12 +103,17 @@ class UserViewSet(viewsets.GenericViewSet,
             return Response()
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def change_notifications(self, request, pk=None):
-        serializer = ChangeNotificationsSerializer(data=request.data)
-        if serializer.is_valid():
-            user = request.user
-            user.notifications_enabled = serializer.validated_data.get('enable')
-            user.save()
-            return Response()
-        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=['get', 'post'], permission_classes=[permissions.IsAuthenticated])
+    def notifications(self, request, pk=None):
+        if request.method == 'GET':
+            return Response({
+                'enabled': request.user.notifications_enabled
+            })
+        elif request.method == 'POST':
+            serializer = ChangeNotificationsSerializer(data=request.data)
+            if serializer.is_valid():
+                user = request.user
+                user.notifications_enabled = serializer.validated_data.get('enable')
+                user.save()
+                return Response()
+            return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)

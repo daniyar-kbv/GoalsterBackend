@@ -32,13 +32,12 @@ def send_email(subject, body, to, attachments=None, count=0):
 
 
 @shared_task
-def reset_spheres(user_id):
+def reset_spheres(sphere_id):
     try:
-        user = MainUser.objects.get(id=user_id)
+        sphere = SelectedSphere.objects.get(id=sphere_id)
     except:
         return
-    selected = SelectedSphere.objects.filter(user=user)
-    selected.delete()
+    sphere.delete()
 #     TODO: Notification
 
 
