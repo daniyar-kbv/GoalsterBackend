@@ -72,7 +72,7 @@ class UserViewSet(viewsets.GenericViewSet,
         q = request.GET.get('q')
         users_data = []
         if q:
-            users = MainUser.objects.filter(email__icontains=q)
+            users = MainUser.objects.filter(Q(email__icontains=q) & ~Q(email=request.user.email))
             serializer = UserShortSerializer(users, many=True)
             users_data = serializer.data
         return Response({
