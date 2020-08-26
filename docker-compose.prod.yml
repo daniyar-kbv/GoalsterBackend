@@ -20,7 +20,7 @@ services:
     - db
     - rabbit
     env_file:
-    - ./.env.dev
+    - ./.env.prod
   db:
     image: postgres
     volumes:
