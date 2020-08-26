@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 from django.core.mail import EmailMessage
 from django.utils import timezone
+from django.conf import settings
 from users.models import MainUser
 from main.models import SelectedSphere, UserAnswer
 import os
@@ -27,6 +28,7 @@ def send_email(subject, body, to, attachments=None, count=0):
         email.send()
         logger.info(f'Task: Email sending to {to} finished')
     except Exception as e:
+        print(settings.EMAIL_HOST_USER)
         print(e)
         logger.info(f'Task: Email sending to {to} failed {print(e) if count == 0 else ""}')
         send_email(subject, body, to, attachments, count=count+1)
