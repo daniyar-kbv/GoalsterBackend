@@ -18,6 +18,7 @@ class SelectedSphereSerializer(serializers.ModelSerializer):
 
 
 class ChooseSpheresInnerSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     sphere = serializers.CharField()
     description = serializers.CharField()
 
@@ -35,9 +36,11 @@ class ChooseSpheresSerializer(serializers.Serializer):
                                                     sphere=sphere.get('sphere'),
                                                     user=user)
             selected.append({
-                'sphere': created.id,
-                'description': created.sphere
+                'id': created.id,
+                'sphere': created.sphere,
+                'description': created.description
             })
+
         return {
             'spheres': selected
         }
