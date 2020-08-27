@@ -57,12 +57,22 @@ class UserViewSet(viewsets.GenericViewSet,
     def temp_auth(self, request, pk=None):
         serializer = UserSendActivationEmailSerializer(data=request.data, context=request)
         if serializer.is_valid():
-            user = MainUser.objects.create_user(email=serializer.validated_data.get('email'))
-            user.save()
+            try:
+                user = MainUser.objects.get(email=serializer.validated_data.get('email'))
+            except:
+                user = MainUser.objects.create_user(email=serializer.validated_data.get('email'))
+                user.save()
             payload = jwt_payload_handler(user)
             token = jwt_encode_handler(payload)
+            spheres = []
+            for sphere in SelectedSphere.objects.filter(user=user):
+                spheres.append({
+                    'sphere': sphere.id,
+                    'description': sphere.sphere
+                })
             data = {
-                'token': token
+                'token': token,
+                'spheres': spheres
             }
             return Response(data)
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
