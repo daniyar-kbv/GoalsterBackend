@@ -127,3 +127,10 @@ class UserViewSet(viewsets.GenericViewSet,
                 user.save()
                 return Response()
             return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def test_premium(self, request, pk=None):
+        user = request.user
+        user.is_premium = True
+        user.save()
+        return Response()
