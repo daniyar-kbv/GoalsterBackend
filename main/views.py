@@ -9,7 +9,7 @@ from main.models import Goal, Observation, Visualization, UserAnswer, SelectedSp
 from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAddSerializer, AddEmotionSerializer, \
     UserAnswerListSerializer, VisualizationCreateSerializer, \
     VisualizationListSerializer, SelectedSphereSerializer, ObservedListSerializer, ObserversListSerializer, \
-    ObservationAcceptSerializer, HelpCreateSerializer
+    ObservationAcceptSerializer, HelpCreateSerializer, UpdateSpheresSerializer
 from utils import permissions, response
 import datetime, constants, PIL
 
@@ -29,11 +29,33 @@ class SphereViewSet(viewsets.GenericViewSet):
             return Response(serializer.data)
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=False, methods=['get', 'put'], permission_classes=[permissions.IsAuthenticated])
     def my_spheres(self, request, pk=None):
-        queryset = SelectedSphere.objects.filter(user=request.user)
-        serializer = SelectedSphereSerializer(queryset, many=True)
-        return Response(serializer.data)
+        if request.method == 'GET':
+            queryset = SelectedSphere.objects.filter(user=request.user)
+            serializer = SelectedSphereSerializer(queryset, many=True)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            new_descriptions = request.data.get('descriptions')
+            serializers = []
+            for index, sphere in enumerate(SelectedSphere.objects.filter(user=request.user)):
+                serializer = UpdateSpheresSerializer(instance=sphere, data={
+                    'description': new_descriptions[index]
+                })
+                if not serializer.is_valid():
+                    return Response(response.make_errors(serializer))
+                serializers.append(serializer)
+            serializer_data = []
+            for serializer in serializers:
+                sphere = serializer.save()
+                serializer_data.append({
+                    'id': sphere.id,
+                    'sphere': sphere.sphere,
+                    'description': sphere.description
+                })
+            return Response(data={
+                'spheres': serializer_data
+            })
 
 
 class GoalViewSet(viewsets.GenericViewSet,

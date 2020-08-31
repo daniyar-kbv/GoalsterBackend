@@ -11,7 +11,7 @@ class SelectedSphereSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SelectedSphere
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'description']
 
     def get_name(self, obj):
         return obj.sphere
@@ -44,6 +44,17 @@ class ChooseSpheresSerializer(serializers.Serializer):
         return {
             'spheres': selected
         }
+
+
+class UpdateSpheresSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SelectedSphere
+        fields = ['description']
+
+    def update(self, instance, validated_data):
+        instance.description = validated_data.get('description', instance.description)
+        instance.save()
+        return instance
 
 
 class GoalListSerializer(serializers.ModelSerializer):
