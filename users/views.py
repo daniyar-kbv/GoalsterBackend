@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework_jwt.settings import api_settings
 from users.models import MainUser, UserActivation
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
-    ChangeNotificationsSerializer
+    ChangeNotificationsSerializer, ConnectSerializer
 from main.tasks import after_three_days
 from main.models import SelectedSphere, Observation
 from main.serializers import SelectedSphereSerializer
@@ -89,12 +89,15 @@ class UserViewSet(viewsets.GenericViewSet,
             "users": users_data
         })
 
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def connect(self, request, pk=None):
         user = request.user
         user.last_activity = timezone.now()
         after_three_days.apply_async(args=[user.id], eta=timezone.now() + datetime.timedelta(days=3))
         user.save()
+        serializer = ConnectSerializer(instance=user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
         data = {
             'hasSpheres': SelectedSphere.objects.filter(user=request.user).count() == 3,
             'email': user.email,

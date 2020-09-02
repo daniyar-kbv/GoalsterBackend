@@ -39,6 +39,7 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(_('Registration date'), auto_now_add=True, null=False, blank=True)
     language = models.PositiveSmallIntegerField(_('Language'), choices=constants.LANGUAGES,
                                                 default=constants.LANGUAGE_RUSSIAN, blank=True)
+    fcm_token = models.CharField(_('FCM Token'), max_length=500, null=True, blank=True)
     notifications_enabled = models.BooleanField(_('Notifications enabled'), default=False, blank=True)
     last_activity = models.DateTimeField(_('Last activity'), null=True, blank=True)
 

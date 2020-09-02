@@ -37,3 +37,14 @@ class ChangeLanguageSerializer(serializers.Serializer):
 
 class ChangeNotificationsSerializer(serializers.Serializer):
     enable = serializers.BooleanField()
+
+
+class ConnectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MainUser
+        fields = ['fcm_token']
+
+    def update(self, instance, validated_data):
+        instance.fcm_token = validated_data.get('fcm_token', instance.fcm_token)
+        instance.save()
+        return instance
