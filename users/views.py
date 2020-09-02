@@ -67,8 +67,9 @@ class UserViewSet(viewsets.GenericViewSet,
             spheres = []
             for sphere in SelectedSphere.objects.filter(user=user):
                 spheres.append({
-                    'sphere': f'{sphere.id}',
-                    'description': sphere.sphere
+                    'id': f'{sphere.id}',
+                    'sphere': f'{sphere.sphere}',
+                    'description': sphere.description
                 })
             data = {
                 'token': token,
