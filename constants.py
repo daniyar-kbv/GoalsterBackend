@@ -28,3 +28,24 @@ DATE_FORMAT = '%d-%m-%Y'
 MAX_REGULAR_FILE_SIZE = 10000000
 
 IMAGE_EXTENSIONS = ['.jpg', '.png', '.jpeg']
+
+FCM_SEND_URL = 'https://fcm.googleapis.com/fcm/send'
+
+NOTIFICATION_3DAYS = 1
+NOTIFICATION_BEFORE_END = 2
+NOTIFICATION_END = 3
+
+NOTIFICATION_TYPES = (
+    (NOTIFICATION_3DAYS, '3 inactive days'),
+    (NOTIFICATION_BEFORE_END, 'Before end of period'),
+    (NOTIFICATION_END, 'End of period')
+)
+
+THREE_DAYS_TITLE = 'Ты 3 дня не заходил в приложение Goalster.'
+THREE_DAYS_BODY = 'Кликни сюда и я покажу тебе то, для чего ты все начал.'
+BEFORE_END_TITLE = 'Скоро подведение итогов!'
+BEFORE_END_BODY = 'Ты готов?'
+END_TITLE = '30 дневный период подходит к концу уже сегодня!'
+END_BODY = 'Кликни сюда и подведи итоги.'
+
+FIREBASE_SERVER_KEY = 'AAAAUR2qWDA:APA91bGLbMhQiCVFSBynt1R4nTtQ2dHeO1XSvfAnZTY_6Khh8xijVrLyWkIUAl_W96xTP1wcvy1TLScgX7pe3iaqlyNxEFQE5FG66I0FPNP-jai1b-IPPnccJOXCtGRM5FmJE7mBF_Yz'

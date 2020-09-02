@@ -4,7 +4,8 @@ from django.core.mail import EmailMessage
 from django.utils import timezone
 from django.conf import settings
 from users.models import MainUser
-from main.models import SelectedSphere, UserAnswer
+from main.models import SelectedSphere, UserAnswer, UserResults, Goal
+from utils.notifications import send_notification
 import os
 import logging, constants
 
@@ -28,20 +29,25 @@ def send_email(subject, body, to, attachments=None, count=0):
         email.send()
         logger.info(f'Task: Email sending to {to} finished')
     except Exception as e:
-        print(settings.EMAIL_HOST_USER)
-        print(e)
         logger.info(f'Task: Email sending to {to} failed {print(e) if count == 0 else ""}')
         send_email(subject, body, to, attachments, count=count+1)
 
 
 @shared_task
-def reset_spheres(sphere_id):
+def reset_spheres(user_id):
     try:
-        sphere = SelectedSphere.objects.get(id=sphere_id)
+        user = MainUser.objects.get(id=user_id)
     except:
         return
-    sphere.delete()
-#     TODO: Notification
+    spheres = SelectedSphere.objects.filter(user=user)
+    existing_results = UserResults.objects.filter(user=user)
+    existing_results.delete()
+    for sphere in spheres:
+        UserResults.objects.create(user=user,
+                                   sphere_name=sphere.sphere,
+                                   number=Goal.objects.filter(user=user, sphere=sphere, is_done=True).count())
+    spheres.delete()
+    send_notification(user.fcm_token, constants.NOTIFICATION_END)
 
 
 @shared_task
@@ -62,7 +68,7 @@ def after_three_days(user_id):
     delta = timezone.now() - user.last_activity
     if delta.days >= 3:
         pass
-    # TODO: notifucation
+    send_notification(user.fcm_token, constants.NOTIFICATION_3DAYS)
 
 
 @shared_task
@@ -71,4 +77,4 @@ def notify_before(user_id):
         user = MainUser.objects.get(id=user_id)
     except:
         return
-    # TODO: Notification
+    send_notification(user.fcm_token, constants.NOTIFICATION_BEFORE_END)

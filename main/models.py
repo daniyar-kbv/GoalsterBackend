@@ -157,3 +157,19 @@ class Help(models.Model):
 
     def __str__(self):
         return f'{self.id}: {self.user}, {self.created_at}'
+
+
+class UserResults(models.Model):
+    user = models.ForeignKey(MainUser,
+                             on_delete=models.CASCADE,
+                             related_name='results',
+                             verbose_name=_('User'),
+                             blank=False, null=False)
+    sphere_name = models.CharField(_('Sphere'), max_length=100, null=False, blank=False)
+    number = models.IntegerField(_('Number of goals'), null=False, blank=False)
+
+    class Meta:
+        verbose_name = _('User results')
+
+    def __str__(self):
+        return f'{self.id}: {_("User")} - {self.user_id}'

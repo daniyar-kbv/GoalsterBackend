@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from main.models import SelectedSphere, Goal, Observation, UserAnswer, Visualization, Help
+from main.models import SelectedSphere, Goal, Observation, UserAnswer, Visualization, Help, UserResults
 from users.models import MainUser
 from utils import response
 import constants
@@ -220,3 +220,9 @@ class HelpCreateSerializer(serializers.ModelSerializer):
         model = Help
         fields = '__all__'
         read_only_fields = ['user']
+
+
+class UserResultsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserResults
+        fields = ['sphere_name', 'number']

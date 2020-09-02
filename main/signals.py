@@ -5,6 +5,7 @@ from main.models import SelectedSphere, Observation, UserAnswer, Visualization
 from main.tasks import reset_spheres, send_email, delete_emoton, notify_before
 from utils import emails, upload
 from dateutil.relativedelta import relativedelta
+from django.utils import timezone
 from PIL import Image
 import datetime
 
@@ -14,8 +15,9 @@ def sphere_saved(sender, instance, created=True, **kwargs):
     if created:
         instance.expires_at = (instance.created_at + relativedelta(days=30)).replace(hour=0, minute=0, second=0)
         instance.save()
-        reset_spheres.apply_async(args=[instance.id], eta=instance.expires_at)
-        notify_before.apply_async(args=[instance.id], eta=instance.expires_at - datetime.timedelta(days=3))
+        if SelectedSphere.objects.filter(user=instance.user).count() == 1:
+            reset_spheres.apply_async(args=[instance.user.id], eta=instance.expires_at)
+            notify_before.apply_async(args=[instance.user.id], eta=instance.expires_at - datetime.timedelta(days=3))
 
 
 @receiver(post_save, sender=Observation)
@@ -46,9 +48,3 @@ def answer_saved(sender, instance, created=True, **kwargs):
 def visualization_pre_deleted(sender, instance, created=True, **kwargs):
     if instance.image:
         upload.delete_folder(instance.image)
-
-
-# @receiver(post_save, sender=Visualization)
-# def visualization_post_save(sender, instance, created=True, **kwargs):
-#     if created:
-#         print(instance.image.path)

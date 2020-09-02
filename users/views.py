@@ -11,8 +11,8 @@ from users.models import MainUser, UserActivation
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
     ChangeNotificationsSerializer, ConnectSerializer
 from main.tasks import after_three_days
-from main.models import SelectedSphere, Observation
-from main.serializers import SelectedSphereSerializer
+from main.models import SelectedSphere, Observation, UserResults
+from main.serializers import UserResultsSerializer
 from utils import encryption, response, permissions
 import constants, datetime
 
@@ -130,6 +130,14 @@ class UserViewSet(viewsets.GenericViewSet,
                 user.save()
                 return Response()
             return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def results(self, request, pk=None):
+        results = UserResults.objects.filter(user=request.user)
+        serializer = UserResultsSerializer(results, many=True)
+        return Response({
+            'results': serializer.data
+        })
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def test_premium(self, request, pk=None):
