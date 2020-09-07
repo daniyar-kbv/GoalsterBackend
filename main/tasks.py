@@ -77,3 +77,13 @@ def notify_before(user_id):
     except:
         return
     send_notification(user.fcm_token, constants.NOTIFICATION_BEFORE_END)
+
+
+@shared_task
+def deactivate_premium(user_id):
+    try:
+        user = MainUser.objects.get(id=user_id)
+    except:
+        return
+    user.is_premium = False
+    user.save()

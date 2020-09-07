@@ -20,6 +20,30 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
+msgid "Month"
+msgstr "Месяц"
+
+msgid "Year"
+msgstr "Год"
+
+msgid "Transactions"
+msgstr "Транзакции"
+
+msgid "Transaction"
+msgstr "Транзакция"
+
+msgid "Time unit"
+msgstr "Еденица времени"
+
+msgid "Time amount"
+msgstr "Коичество времени"
+
+msgid "Product identifier"
+msgstr "Идентификатор продукта"
+
+msgid "Identifier"
+msgstr "Идентификатор"
+
 msgid "Number of goals"
 msgstr "Кол-во целей"
 

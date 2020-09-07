@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from users.models import UserActivation, MainUser
+from users.models import UserActivation, MainUser, Transaction
 from utils import response
 
 
@@ -48,3 +48,10 @@ class ConnectSerializer(serializers.ModelSerializer):
         instance.fcm_token = validated_data.get('fcm_token', instance.fcm_token)
         instance.save()
         return instance
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'
+        read_only_fields = ['user']

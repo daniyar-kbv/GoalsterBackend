@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework_jwt.settings import api_settings
 from users.models import MainUser, UserActivation
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
-    ChangeNotificationsSerializer, ConnectSerializer
+    ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer
 from main.tasks import after_three_days
 from main.models import SelectedSphere, Observation, UserResults
 from main.serializers import UserResultsSerializer
@@ -141,8 +141,9 @@ class UserViewSet(viewsets.GenericViewSet,
         })
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def test_premium(self, request, pk=None):
-        user = request.user
-        user.is_premium = True
-        user.save()
-        return Response()
+    def premium(self, request, pk=None):
+        serializer = TransactionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response()
+        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)

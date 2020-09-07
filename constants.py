@@ -18,6 +18,14 @@ TIME_TYPES = (
     (TIME_EVENING, _('Evening'))
 )
 
+MONTH = 1
+YEAR = 2
+
+TIME_FRAMES = (
+    (MONTH, (_('Month'))),
+    (YEAR, (_('Year')))
+)
+
 ACTIVATION_EMAIL_SUBJECT = 'test'
 ACTIVATION_EMAIL_BODY_START = 'test'
 ACTIVATION_EMAIL_BODY_END = 'test'

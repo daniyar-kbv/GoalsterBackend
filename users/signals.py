@@ -1,9 +1,10 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
-from users.models import UserActivation
-from main.tasks import send_email
+from users.models import UserActivation, Transaction
+from main.tasks import send_email, deactivate_premium
 from utils import emails
-import constants
+from dateutil.relativedelta import relativedelta
+import constants, datetime
 
 
 @receiver(post_save, sender=UserActivation)
@@ -15,3 +16,16 @@ def activation_created(sender, instance, created=True, **kwargs):
                 send_email.delay(constants.ACTIVATION_EMAIL_SUBJECT,
                                  emails.generate_activation_email(instance.email, request=instance._request),
                                  instance.email)
+
+
+@receiver(post_save, sender=Transaction)
+def transaction_created(sender, instance, created=True, **kwargs):
+    if created:
+        user = instance.user
+        user.is_premium = True
+        user.save()
+        if instance.time_unit == constants.MONTH:
+            eta = datetime.datetime.now() + relativedelta(months=instance.time_amount)
+        elif instance.time_unit == constants.YEAR:
+            eta = datetime.datetime.now() + relativedelta(years=instance.time_amount)
+        deactivate_premium.apply_async(args=[instance.user.id], eta=eta)

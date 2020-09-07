@@ -79,3 +79,21 @@ class UserActivation(models.Model):
     def __str__(self):
         return f'{self.id}: {self.email}'
 
+
+class Transaction(models.Model):
+    user = models.ForeignKey(MainUser,
+                             on_delete=models.CASCADE,
+                             related_name='transactions',
+                             verbose_name=_('User'))
+    identifier = models.CharField(_('Identifier'), max_length=1000)
+    date = models.CharField(_('Date'), max_length=100)
+    product_id = models.CharField(_('Product identifier'), max_length=500)
+    time_amount = models.IntegerField(_('Time amount'))
+    time_unit = models.PositiveSmallIntegerField(_('Time unit'), choices=constants.TIME_FRAMES, default=constants.MONTH)
+
+    class Meta:
+        verbose_name = _('Transaction')
+        verbose_name_plural = _('Transactions')
+
+    def __str__(self):
+        return f'{self.id}: {self.user} {self.product_id}'
