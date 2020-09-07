@@ -94,7 +94,7 @@ class UserViewSet(viewsets.GenericViewSet,
     def connect(self, request, pk=None):
         user = request.user
         user.last_activity = timezone.now()
-        after_three_days.apply_async(args=[user.id], eta=timezone.now() + datetime.timedelta(days=3))
+        after_three_days.apply_async(args=[user.id], eta=datetime.datetime.now() + datetime.timedelta(days=3))
         user.save()
         serializer = ConnectSerializer(instance=user, data=request.data)
         if serializer.is_valid():

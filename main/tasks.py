@@ -67,8 +67,7 @@ def after_three_days(user_id):
         return
     delta = timezone.now() - user.last_activity
     if delta.days >= 3:
-        pass
-    send_notification(user.fcm_token, constants.NOTIFICATION_3DAYS)
+        send_notification(user.fcm_token, constants.NOTIFICATION_3DAYS)
 
 
 @shared_task
