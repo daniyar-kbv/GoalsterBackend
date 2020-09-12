@@ -200,8 +200,7 @@ class GoalViewSet(viewsets.GenericViewSet,
 
 class VisualizationViewSet(viewsets.GenericViewSet,
                            mixins.ListModelMixin,
-                           mixins.CreateModelMixin,
-                           mixins.DestroyModelMixin):
+                           mixins.CreateModelMixin):
     queryset = Visualization.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
@@ -220,10 +219,7 @@ class VisualizationViewSet(viewsets.GenericViewSet,
         })
 
     def create(self, request, *args, **kwargs):
-        context = {
-            'user': request.user
-        }
-        serializer = VisualizationCreateSerializer(data=request.data, context=context)
+        serializer = VisualizationCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response()

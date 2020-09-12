@@ -155,13 +155,6 @@ class VisualizationCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['user']
 
-    def create(self, validated_data):
-        print(Visualization.objects.filter(sphere=validated_data.get('sphere'), user=self.context.get('user')))
-        if Visualization.objects.filter(sphere=validated_data.get('sphere'), user=self.context.get('user')).count() == 3:
-            raise serializers.ValidationError(response.make_messages([_('You can not add more than 3 visualizations to one area')]))
-        visualization = Visualization.objects.create(**validated_data)
-        return visualization
-
 
 class VisualizationListSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
