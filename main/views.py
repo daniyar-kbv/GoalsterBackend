@@ -229,6 +229,11 @@ class VisualizationViewSet(viewsets.GenericViewSet,
             return Response()
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response()
+
 
 class EmotionsViewSet(viewsets.GenericViewSet,
                       mixins.ListModelMixin):
