@@ -4,20 +4,12 @@ from users.models import UserActivation, MainUser, Transaction
 from utils import response
 
 
-class UserSendActivationEmailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserActivation
-        fields = '__all__'
+class UserSendActivationEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
 
-    def create(self, validated_data):
-        try:
-            activation = UserActivation.objects.get(email=validated_data.get('email'))
-        except:
-            activation = UserActivation.objects.create(**validated_data)
-        activation._request = self.context
-        activation._created = True
-        activation.save()
-        return activation
+
+class UserVerifyActivationEmailSerializer(serializers.Serializer):
+    email = serializers.CharField()
 
 
 class UserShortSerializer(serializers.ModelSerializer):

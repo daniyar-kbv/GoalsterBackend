@@ -57,3 +57,12 @@ END_TITLE = '30 дневный период подходит к концу уж�
 END_BODY = 'Кликни сюда и подведи итоги.'
 
 FIREBASE_SERVER_KEY = 'AAAAUR2qWDA:APA91bGLbMhQiCVFSBynt1R4nTtQ2dHeO1XSvfAnZTY_6Khh8xijVrLyWkIUAl_W96xTP1wcvy1TLScgX7pe3iaqlyNxEFQE5FG66I0FPNP-jai1b-IPPnccJOXCtGRM5FmJE7mBF_Yz'
+
+FIREBASE_DEEPLINKS_PREFIX = 'https://app.goalsterapp.com/'
+FIREBASE_DEEPLINKS_LINK = 'https://goalsterapp.com'
+FIREBASE_DEEPLINKS_ISI = '1532862482'
+FIREBASE_DEEPLINKS_IBI = 'com.goalster.app'
+FIREBASE_DEEPLINKS_EFR = '1'
+
+DEEPLINK_AUTH = 1
+DEEPLINK_PREMIUM = 2

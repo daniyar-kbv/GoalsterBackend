@@ -7,13 +7,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_jwt.settings import api_settings
-from users.models import MainUser, UserActivation
+from users.models import MainUser, UserActivation, Transaction
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
-    ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer
-from main.tasks import after_three_days
+    ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer, UserVerifyActivationEmailSerializer
+from main.tasks import after_three_days, send_email
 from main.models import SelectedSphere, Observation, UserResults
 from main.serializers import UserResultsSerializer
-from utils import encryption, response, permissions
+from utils import encryption, response, permissions, emails
 import constants, datetime
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -27,31 +27,44 @@ class UserViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['post'], name='send_activation_email')
     def send_activation_email(self, request, pk=None):
-        serializer = UserSendActivationEmailSerializer(data=request.data, context=request)
+        serializer = UserSendActivationEmailSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            send_email.delay(constants.ACTIVATION_EMAIL_SUBJECT,
+                             emails.generate_activation_email(serializer.validated_data.get('email')),
+                             serializer.validated_data.get('email'))
             return Response()
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['get'], name='verify-email')
     def verify_email(self, request, pk=None):
         email = encryption.decrypt(pk)
-        activation = UserActivation.objects.filter(email=email).first()
-        if not activation:
-            return Response(response.make_messages([_('Activation is no longer valid')]), status.HTTP_400_BAD_REQUEST)
-        if activation.is_active:
-            activation.is_active = False
-            user = MainUser.objects.create_user(email=activation.email)
-            activation.user = user
-            activation.save()
+        try:
+            user = MainUser.objects.get(email=email)
+        except:
+            user = MainUser.objects.create_user(email=email)
             user.save()
-            payload = jwt_payload_handler(user)
-            token = jwt_encode_handler(payload)
-            data = {
-                'token': token
-            }
-            return Response(data)
-        return Response(response.make_messages([_('Activation is no longer valid')]), status.HTTP_400_BAD_REQUEST)
+        payload = jwt_payload_handler(user)
+        token = jwt_encode_handler(payload)
+        spheres = []
+        last_transaction = Transaction.objects.filter(user=user).order_by('-created_at')
+        premium_type = None
+        if last_transaction:
+            premium_type = f'{last_transaction.time_amount} {last_transaction.time_unit}'
+        for sphere in SelectedSphere.objects.filter(user=user):
+            spheres.append({
+                'id': sphere.id,
+                'sphere': sphere.sphere,
+                'description': sphere.description
+            })
+        data = {
+            'token': token,
+            'spheres': spheres,
+            'email': user.email,
+            'isPremium': user.is_premium,
+            'premiumType': premium_type,
+            'notConfirmedCount': Observation.objects.filter(Q(observer=user) & Q(Q(is_confirmed=None) | Q(is_confirmed=True))).distinct('observer').count()
+        }
+        return Response(data)
 
     @action(detail=False, methods=['post'])
     def temp_auth(self, request, pk=None):
@@ -99,10 +112,15 @@ class UserViewSet(viewsets.GenericViewSet,
         serializer = ConnectSerializer(instance=user, data=request.data)
         if serializer.is_valid():
             serializer.save()
+        last_transaction = Transaction.objects.filter(user=user).order_by('-created_at')
+        premium_type = None
+        if last_transaction:
+            premium_type = f'{last_transaction.time_amount} {last_transaction.time_unit}'
         data = {
             'hasSpheres': SelectedSphere.objects.filter(user=request.user).count() == 3,
             'email': user.email,
             'isPremium': user.is_premium,
+            'premiumType': premium_type,
             'notConfirmedCount': Observation.objects.filter(Q(observer=request.user) & Q(Q(is_confirmed=None) | Q(is_confirmed=True))).distinct('observer').count()
         }
         return Response(data)

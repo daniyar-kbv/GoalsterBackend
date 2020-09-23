@@ -29,11 +29,9 @@ def observation_saved(sender, instance, created=True, **kwargs):
         attrs_needed = ['_request', '_created']
         if all(hasattr(instance, attr) for attr in attrs_needed):
             if instance._created:
-                pass
-                # TODO: finish email sending
-                # send_email.delay('asd',
-                #                  emails.generate_observation_confirmation_email(instance.email, request=instance._request),
-                #                  instance.email)
+                send_email.delay('asd',
+                                 emails.generate_observation_confirmation_email(instance.observer.email),
+                                 instance.observer.email)
 
 
 @receiver(post_save, sender=UserAnswer)

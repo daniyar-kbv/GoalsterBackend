@@ -90,6 +90,7 @@ class Transaction(models.Model):
     product_id = models.CharField(_('Product identifier'), max_length=500)
     time_amount = models.IntegerField(_('Time amount'))
     time_unit = models.PositiveSmallIntegerField(_('Time unit'), choices=constants.TIME_FRAMES, default=constants.MONTH)
+    created_at = models.DateTimeField(_('Creation date'), auto_now_add=True, blank=True)
 
     class Meta:
         verbose_name = _('Transaction')
