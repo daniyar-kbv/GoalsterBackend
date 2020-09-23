@@ -62,7 +62,7 @@ class UserViewSet(viewsets.GenericViewSet,
             'email': user.email,
             'isPremium': user.is_premium,
             'premiumType': premium_type,
-            'notConfirmedCount': Observation.objects.filter(Q(observer=request.user) & Q(is_confirmed=None)).distinct('observer').count()
+            'notConfirmedCount': Observation.objects.filter(Q(observer=user) & Q(is_confirmed=None)).distinct('observer').count()
         }
         return Response(data)
 
