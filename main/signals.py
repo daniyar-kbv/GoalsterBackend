@@ -25,6 +25,8 @@ def observation_saved(sender, instance, created=True, **kwargs):
     if instance:
         if created:
             instance.observed = instance.goal.user
+            if Observation.objects.filter(observed=instance.goal.user, observer=instance.observer, is_confirmed=True).count() > 0:
+                instance.is_confirmed = True
             instance.save()
         attrs_needed = ['_request', '_created']
         if all(hasattr(instance, attr) for attr in attrs_needed):
