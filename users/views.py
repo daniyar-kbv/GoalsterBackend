@@ -62,7 +62,7 @@ class UserViewSet(viewsets.GenericViewSet,
             'email': user.email,
             'isPremium': user.is_premium,
             'premiumType': premium_type,
-            'notConfirmedCount': Observation.objects.filter(Q(observer=user) & Q(Q(is_confirmed=None) | Q(is_confirmed=True))).distinct('observer').count()
+            'notConfirmedCount': Observation.objects.filter(Q(observer=request.user) & Q(is_confirmed=None)).distinct('observer').count()
         }
         return Response(data)
 
@@ -121,7 +121,7 @@ class UserViewSet(viewsets.GenericViewSet,
             'email': user.email,
             'isPremium': user.is_premium,
             'premiumType': premium_type,
-            'notConfirmedCount': Observation.objects.filter(Q(observer=request.user) & Q(Q(is_confirmed=None) | Q(is_confirmed=True))).distinct('observer').count()
+            'notConfirmedCount': Observation.objects.filter(Q(observer=request.user) & Q(is_confirmed=None)).distinct('observer').count()
         }
         return Response(data)
 
