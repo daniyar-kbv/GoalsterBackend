@@ -10,6 +10,7 @@ from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAd
     UserAnswerListSerializer, VisualizationCreateSerializer, \
     VisualizationListSerializer, SelectedSphereSerializer, ObservedListSerializer, ObserversListSerializer, \
     ObservationAcceptSerializer, HelpCreateSerializer, UpdateSpheresSerializer
+from main.tasks import send_email
 from utils import permissions, response
 import datetime, constants, PIL
 
@@ -56,6 +57,11 @@ class SphereViewSet(viewsets.GenericViewSet):
             return Response(data={
                 'spheres': serializer_data
             })
+
+    # @action(detail=False, methods=['post'])
+    # def test(self, request, pk=None):
+    #     send_email.delay('test', 'asd', 'daniyar.kbv@gmail.com', attachments=['test_files/visualization_desk_ru.pdf'])
+    #     return Response()
 
 
 class GoalViewSet(viewsets.GenericViewSet,

@@ -25,7 +25,8 @@ def send_email(subject, body, to, attachments=None, count=0):
             to=[to]
         )
         if attachments:
-            email.attach_file(attachments)
+            for attachment in attachments:
+                email.attach_file(attachment)
         email.send()
         logger.info(f'Task: Email sending to {to} finished')
     except Exception as e:
