@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_jwt.settings import api_settings
-from users.models import MainUser, UserActivation, Transaction
+from users.models import MainUser, Transaction
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
     ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer, UserVerifyActivationEmailSerializer
 from main.tasks import after_three_days, send_email
@@ -175,5 +175,13 @@ class UserViewSet(viewsets.GenericViewSet,
         serializer = TransactionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
+            if request.headers.get('Accept-Language') == 'ru-ru':
+                file = 'documents/visualization_desk_ru.pdf'
+            else:
+                file = 'documents/visualization_desk_en.pdf'
+            send_email.delay('Premium purchased',
+                             'You have successfully purchased premium\n',
+                             request.user.email,
+                             [file])
             return Response()
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)

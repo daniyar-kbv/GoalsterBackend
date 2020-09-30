@@ -60,7 +60,14 @@ class SphereViewSet(viewsets.GenericViewSet):
 
     # @action(detail=False, methods=['post'])
     # def test(self, request, pk=None):
-    #     send_email.delay('test', 'asd', 'daniyar.kbv@gmail.com', attachments=['test_files/visualization_desk_ru.pdf'])
+    #     if request.headers.get('Accept-Language') == 'ru-ru':
+    #         file = 'documents/visualization_desk_ru.pdf'
+    #     else:
+    #         file = 'documents/visualization_desk_en.pdf'
+    #     send_email.delay('Premium purchased',
+    #                      'You have successfully purchased premium\n',
+    #                      request.user.email,
+    #                      [file])
     #     return Response()
 
 

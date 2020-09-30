@@ -62,24 +62,6 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
         return f'{self.id}: {self.email}'
 
 
-class UserActivation(models.Model):
-    email = models.EmailField(_('Email'))
-    is_active = models.BooleanField(_('Is active'), default=True, blank=True)
-    created_at = models.DateTimeField(_('Creation date'), auto_now_add=True, blank=True)
-    user = models.OneToOneField(MainUser,
-                                on_delete=models.CASCADE,
-                                related_name='activation',
-                                verbose_name=_('User'),
-                                blank=True, null=True)
-
-    class Meta:
-        verbose_name = _('User activation')
-        verbose_name_plural = _('User activations')
-
-    def __str__(self):
-        return f'{self.id}: {self.email}'
-
-
 class Transaction(models.Model):
     user = models.ForeignKey(MainUser,
                              on_delete=models.CASCADE,

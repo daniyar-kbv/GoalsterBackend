@@ -1,5 +1,5 @@
 from django.contrib import admin
-from users.models import MainUser, UserActivation, Transaction
+from users.models import MainUser, Transaction
 from main.models import SelectedSphere, UserAnswer, Visualization, Goal, UserResults
 
 
@@ -11,11 +11,6 @@ class UserTransactionsInline(admin.StackedInline):
 
 class UserResultsInline(admin.StackedInline):
     model = UserResults
-    extra = 0
-
-
-class UserActivationInline(admin.StackedInline):
-    model = UserActivation
     extra = 0
 
 
@@ -52,7 +47,7 @@ class VisualizationInline(admin.StackedInline):
 @admin.register(MainUser)
 class MainUserAdmin(admin.ModelAdmin):
     list_display = ('id', 'email', 'is_active', 'is_staff', 'created_at')
-    inlines = [UserActivationInline, SelectedSphereInline, UserAnswerInline, VisualizationInline, UserResultsInline,
+    inlines = [SelectedSphereInline, UserAnswerInline, VisualizationInline, UserResultsInline,
                UserTransactionsInline]
     readonly_fields = ['last_login', 'last_activity']
     search_fields = ['email']
