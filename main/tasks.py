@@ -3,7 +3,7 @@ from celery import shared_task
 from django.core.mail import EmailMessage
 from django.utils import timezone
 from django.conf import settings
-from users.models import MainUser
+from users.models import MainUser, Transaction
 from main.models import SelectedSphere, UserAnswer, UserResults, Goal
 from utils.notifications import send_notification
 import os
@@ -81,10 +81,11 @@ def notify_before(user_id):
 
 
 @shared_task
-def deactivate_premium(user_id):
+def deactivate_premium(user_id, transaction_id):
     try:
         user = MainUser.objects.get(id=user_id)
     except:
         return
-    user.is_premium = False
-    user.save()
+    if Transaction.objects.filter(user=user).first().id == transaction_id:
+        user.is_premium = False
+        user.save()

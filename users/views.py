@@ -13,7 +13,7 @@ from users.serializers import UserSendActivationEmailSerializer, UserShortSerial
 from main.tasks import after_three_days, send_email
 from main.models import SelectedSphere, Observation, UserResults
 from main.serializers import UserResultsSerializer
-from utils import encryption, response, permissions, emails
+from utils import encryption, response, permissions, emails, general
 import constants, datetime
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -46,10 +46,12 @@ class UserViewSet(viewsets.GenericViewSet,
         payload = jwt_payload_handler(user)
         token = jwt_encode_handler(payload)
         spheres = []
-        last_transaction = Transaction.objects.filter(user=user).order_by('-created_at')
+        last_transaction = Transaction.objects.filter(user=user).first()
         premium_type = None
         if last_transaction:
-            premium_type = f'{last_transaction.time_amount} {last_transaction.time_unit}'
+            premium_type = f'{last_transaction.time_amount} ' \
+                           f'{general.get_type_name(constants.TIME_FRAMES, last_transaction.time_unit)}' \
+                           f'{_("s") if last_transaction.time_amount > 1 else ""}'
         for sphere in SelectedSphere.objects.filter(user=user):
             spheres.append({
                 'id': sphere.id,
@@ -112,10 +114,12 @@ class UserViewSet(viewsets.GenericViewSet,
         serializer = ConnectSerializer(instance=user, data=request.data)
         if serializer.is_valid():
             serializer.save()
-        last_transaction = Transaction.objects.filter(user=user).order_by('-created_at')
+        last_transaction = Transaction.objects.filter(user=user).first()
         premium_type = None
         if last_transaction:
-            premium_type = f'{last_transaction.time_amount} {last_transaction.time_unit}'
+            premium_type = f'{last_transaction.time_amount} ' \
+                           f'{general.get_type_name(constants.TIME_FRAMES, last_transaction.time_unit)}' \
+                           f'{_("s") if last_transaction.time_amount > 1 else ""}'
         spheres = []
         for sphere in SelectedSphere.objects.filter(user=user):
             spheres.append({

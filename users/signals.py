@@ -28,4 +28,4 @@ def transaction_created(sender, instance, created=True, **kwargs):
             eta = datetime.datetime.now() + relativedelta(months=instance.time_amount)
         elif instance.time_unit == constants.YEAR:
             eta = datetime.datetime.now() + relativedelta(years=instance.time_amount)
-        deactivate_premium.apply_async(args=[instance.user.id], eta=eta)
+        deactivate_premium.apply_async(args=[instance.user.id, instance.id], eta=eta)

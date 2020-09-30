@@ -95,6 +95,7 @@ class Transaction(models.Model):
     class Meta:
         verbose_name = _('Transaction')
         verbose_name_plural = _('Transactions')
+        ordering = ['-created_at']
 
     def __str__(self):
         return f'{self.id}: {self.user} {self.product_id}'
