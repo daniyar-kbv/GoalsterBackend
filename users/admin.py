@@ -49,7 +49,7 @@ class MainUserAdmin(admin.ModelAdmin):
     list_display = ('id', 'email', 'is_active', 'is_staff', 'created_at')
     inlines = [SelectedSphereInline, UserAnswerInline, VisualizationInline, UserResultsInline,
                UserTransactionsInline]
-    readonly_fields = ['last_login', 'last_activity']
+    readonly_fields = ['last_login', 'last_activity', 'received_three_days_notification']
     search_fields = ['email']
     list_filter = ['is_staff', 'is_active']
     ordering = ['-created_at']
