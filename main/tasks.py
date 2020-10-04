@@ -67,8 +67,10 @@ def after_three_days(user_id):
     except:
         return
     delta = timezone.now() - user.last_activity
-    if delta.days >= 3:
+    if delta.days >= 3 and not user.received_three_days_notification:
         send_notification(user.fcm_token, constants.NOTIFICATION_3DAYS)
+        user.received_three_days_notification = True
+        user.save()
 
 
 @shared_task

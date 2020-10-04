@@ -151,7 +151,6 @@ class GoalViewSet(viewsets.GenericViewSet,
             'items': data
         })
 
-
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def add(self, request, pk=None):
         context = {

@@ -20,6 +20,12 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
+msgid "Received notification after 3 inactive days"
+msgstr "Получил уведомлении после 3-х неактивных дней"
+
+msgid "You have to be premium member to add more than 6 goals to one day"
+msgstr "Вы должны быть премиум пользователем, что бы добавлять более 6-ти целей на один день"
+
 msgid "s"
 msgstr "а"
 

@@ -42,6 +42,11 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
     fcm_token = models.CharField(_('FCM Token'), max_length=500, null=True, blank=True)
     notifications_enabled = models.BooleanField(_('Notifications enabled'), default=True, blank=True)
     last_activity = models.DateTimeField(_('Last activity'), null=True, blank=True)
+    received_three_days_notification = models.BooleanField(
+        _('Received notification after 3 inactive days'),
+        default=False,
+        blank=True
+    )
 
     is_premium = models.BooleanField(_('Premium'), default=False, blank=True)
     is_staff = models.BooleanField(_('Is admin'), default=False)
