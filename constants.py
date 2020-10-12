@@ -66,3 +66,5 @@ FIREBASE_DEEPLINKS_EFR = '1'
 
 DEEPLINK_AUTH = 1
 DEEPLINK_PREMIUM = 2
+
+APPLE_TEST_EMAIL = 'jan.e.r.ebe.c.ca.lynn.tm.p@gmail.com'

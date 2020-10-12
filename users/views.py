@@ -13,7 +13,7 @@ from users.serializers import UserSendActivationEmailSerializer, UserShortSerial
 from main.tasks import after_three_days, send_email
 from main.models import SelectedSphere, Observation, UserResults
 from main.serializers import UserResultsSerializer
-from utils import encryption, response, permissions, emails, general
+from utils import encryption, response, permissions, emails, general, auth
 import constants, datetime
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -29,10 +29,21 @@ class UserViewSet(viewsets.GenericViewSet,
     def send_activation_email(self, request, pk=None):
         serializer = UserSendActivationEmailSerializer(data=request.data)
         if serializer.is_valid():
-            send_email.delay(constants.ACTIVATION_EMAIL_SUBJECT,
-                             emails.generate_activation_email(serializer.validated_data.get('email')),
-                             serializer.validated_data.get('email'))
-            return Response()
+            if serializer.validated_data.get('email') == constants.APPLE_TEST_EMAIL:
+                try:
+                    user = MainUser.objects.get(email=serializer.validated_data.get('email'))
+                except:
+                    return Response({
+                        'emailed': True
+                    })
+                return Response(auth.auth_user_data(user, request))
+            else:
+                send_email.delay(constants.ACTIVATION_EMAIL_SUBJECT,
+                                 emails.generate_activation_email(serializer.validated_data.get('email')),
+                                 serializer.validated_data.get('email'))
+                return Response({
+                    'emailed': True
+                })
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['get'], name='verify-email')
@@ -43,30 +54,7 @@ class UserViewSet(viewsets.GenericViewSet,
         except:
             user = MainUser.objects.create_user(email=email)
             user.save()
-        payload = jwt_payload_handler(user)
-        token = jwt_encode_handler(payload)
-        spheres = []
-        last_transaction = Transaction.objects.filter(user=user).first()
-        premium_type = None
-        if last_transaction:
-            premium_type = f'{last_transaction.time_amount} ' \
-                           f'{general.get_type_name(constants.TIME_FRAMES, last_transaction.time_unit)}' \
-                           f'{_("s") if last_transaction.time_amount > 1 else ""}'
-        for sphere in SelectedSphere.objects.filter(user=user):
-            spheres.append({
-                'id': sphere.id,
-                'sphere': sphere.sphere,
-                'description': sphere.description
-            })
-        data = {
-            'token': token,
-            'spheres': spheres,
-            'email': user.email,
-            'isPremium': user.is_premium,
-            'premiumType': premium_type,
-            'notConfirmedCount': Observation.objects.filter(Q(observer=user) & Q(is_confirmed=None)).distinct('observer').count()
-        }
-        return Response(data)
+        return Response(auth.auth_user_data(user, request))
 
     @action(detail=False, methods=['post'])
     def temp_auth(self, request, pk=None):
@@ -77,30 +65,7 @@ class UserViewSet(viewsets.GenericViewSet,
             except:
                 user = MainUser.objects.create_user(email=serializer.validated_data.get('email'))
                 user.save()
-            payload = jwt_payload_handler(user)
-            token = jwt_encode_handler(payload)
-            spheres = []
-            last_transaction = Transaction.objects.filter(user=user).first()
-            premium_type = None
-            if last_transaction:
-                premium_type = f'{last_transaction.time_amount} ' \
-                               f'{general.get_type_name(constants.TIME_FRAMES, last_transaction.time_unit)}' \
-                               f'{_("s") if last_transaction.time_amount > 1 else ""}'
-            for sphere in SelectedSphere.objects.filter(user=user):
-                spheres.append({
-                    'id': sphere.id,
-                    'sphere': sphere.sphere,
-                    'description': sphere.description
-                })
-            data = {
-                'token': token,
-                'spheres': spheres,
-                'email': user.email,
-                'isPremium': user.is_premium,
-                'premiumType': premium_type,
-                'notConfirmedCount': Observation.objects.filter(Q(observer=user) & Q(is_confirmed=None)).distinct('observer').count()
-            }
-            return Response(data)
+            return Response(auth.auth_user_data(user, request))
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], name='search', permission_classes=[permissions.IsAuthenticated])
@@ -125,28 +90,7 @@ class UserViewSet(viewsets.GenericViewSet,
         serializer = ConnectSerializer(instance=user, data=request.data)
         if serializer.is_valid():
             serializer.save()
-        last_transaction = Transaction.objects.filter(user=user).first()
-        premium_type = None
-        if last_transaction:
-            premium_type = f'{last_transaction.time_amount} ' \
-                           f'{general.get_type_name(constants.TIME_FRAMES, last_transaction.time_unit)}' \
-                           f'{_("s") if last_transaction.time_amount > 1 else ""}'
-        spheres = []
-        for sphere in SelectedSphere.objects.filter(user=user):
-            spheres.append({
-                'id': sphere.id,
-                'sphere': sphere.sphere,
-                'description': sphere.description
-            })
-        data = {
-            'hasSpheres': SelectedSphere.objects.filter(user=request.user).count() == 3,
-            'spheres': spheres,
-            'email': user.email,
-            'isPremium': user.is_premium,
-            'premiumType': premium_type,
-            'notConfirmedCount': Observation.objects.filter(Q(observer=request.user) & Q(is_confirmed=None)).distinct('observer').count()
-        }
-        return Response(data)
+        return Response(auth.auth_user_data(user, request))
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def change_language(self, request, pk=None):
