@@ -130,13 +130,16 @@ class UserViewSet(viewsets.GenericViewSet,
         serializer = TransactionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
+            files = []
             if request.headers.get('Accept-Language') == 'ru-ru':
-                file = 'documents/visualization_desk_ru.pdf'
+                files.append('documents/visualization_board_ru.pdf')
+                files.append('documents/to-do_list_ru.pdf')
             else:
-                file = 'documents/visualization_desk_en.pdf'
+                files.append('documents/visualization_board_en.pdf')
+                files.append('documents/to-do_list_en.pdf')
             send_email.delay('Premium purchased',
                              'You have successfully purchased premium\n',
                              request.user.email,
-                             [file])
+                             files)
             return Response()
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
