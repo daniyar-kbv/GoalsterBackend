@@ -50,9 +50,7 @@ ACTIVATION_EMAIL_BODY_END_RU = '''
 Вы в любое время можете обратиться к нам. Мы ценим наших клиентов и не оставим без внимания Ваш запрос.
 '''
 
-PREMIUM_EMAIL_SUBJECT_RU = '''
-Вы приобрели премиум
-'''
+PREMIUM_EMAIL_SUBJECT_RU = 'Вы приобрели премиум'
 PREMIUM_EMAIL_BODY_RU = '''
 - Уважаемый пользователь,
 
@@ -67,9 +65,7 @@ PREMIUM_EMAIL_BODY_RU = '''
 Вы в любое время можете обратиться к нам. Мы ценим наших клиентов и не оставим без внимания Ваш запрос.
 '''
 
-PREMIUM_EMAIL_SUBJECT_EN = '''
-Premium purchased
-'''
+PREMIUM_EMAIL_SUBJECT_EN = 'Premium purchased'
 PREMIUM_EMAIL_BODY_EN = '''
 - Dear user,
 
