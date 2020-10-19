@@ -36,7 +36,7 @@ services:
       python manage.py compilemessages --locale=ru &&
       python manage.py migrate &&
       python manage.py collectstatic --no-input --clear &&
-      python manage.py runserver 0:8990"
+      gunicorn hello_django.wsgi:application --bind 0.0.0.0:8990"
     volumes:
       - .:/goalster
     ports:
