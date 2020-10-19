@@ -29,5 +29,5 @@ urlpatterns = i18n_patterns(
     static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 admin.site.index_title = ''
-admin.site.site_header = _('GOALSTER admin panel')
+admin.site.site_header = _('GOALSTERS admin panel')
 admin.site.site_title = ''

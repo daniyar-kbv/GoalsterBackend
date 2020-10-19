@@ -7,7 +7,7 @@ from utils import emails, upload
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from PIL import Image
-import datetime
+import datetime, constants
 
 
 @receiver(post_save, sender=SelectedSphere)
@@ -31,8 +31,15 @@ def observation_saved(sender, instance, created=True, **kwargs):
         attrs_needed = ['_request', '_created']
         if all(hasattr(instance, attr) for attr in attrs_needed):
             if instance._created:
-                send_email.delay('asd',
-                                 emails.generate_observation_confirmation_email(instance.observer.email),
+                if instance._request.headers.get('Accept-Language') == 'ru-ru':
+                    subject = constants.OBSERVATION_EMAIL_SUBJECT_RU
+                else:
+                    subject = constants.OBSERVATION_EMAIL_SUBJECT_EN
+                send_email.delay(subject,
+                                 emails.generate_observation_confirmation_email(
+                                     instance.observer.email,
+                                     instance._request.headers.get('Accept-Language')
+                                 ),
                                  instance.observer.email)
 
 

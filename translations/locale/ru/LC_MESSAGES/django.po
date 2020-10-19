@@ -185,8 +185,8 @@ msgstr "Максимальный размер файла"
 msgid "Allowed extensions"
 msgstr "Разрешенные расширения"
 
-msgid "GOALSTER admin panel"
-msgstr "Панель администрирования GOALSTER"
+msgid "GOALSTERS admin panel"
+msgstr "Панель администрирования GOALSTERS"
 
 msgid "Sphere"
 msgstr "Сфера"

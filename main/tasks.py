@@ -48,7 +48,7 @@ def reset_spheres(user_id):
                                    sphere_name=sphere.sphere,
                                    number=Goal.objects.filter(user=user, sphere=sphere, is_done=True).count())
     spheres.delete()
-    send_notification(user.fcm_token, constants.NOTIFICATION_END)
+    send_notification(user, constants.NOTIFICATION_END)
 
 
 @shared_task
@@ -68,7 +68,7 @@ def after_three_days(user_id):
         return
     delta = timezone.now() - user.last_activity
     if delta.days >= 3 and not user.received_three_days_notification:
-        send_notification(user.fcm_token, constants.NOTIFICATION_3DAYS)
+        send_notification(user, constants.NOTIFICATION_3DAYS)
         user.received_three_days_notification = True
         user.save()
 
@@ -79,7 +79,7 @@ def notify_before(user_id):
         user = MainUser.objects.get(id=user_id)
     except:
         return
-    send_notification(user.fcm_token, constants.NOTIFICATION_BEFORE_END)
+    send_notification(user, constants.NOTIFICATION_BEFORE_END)
 
 
 @shared_task

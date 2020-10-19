@@ -38,8 +38,15 @@ class UserViewSet(viewsets.GenericViewSet,
                     })
                 return Response(auth.auth_user_data(user, request))
             else:
-                send_email.delay(constants.ACTIVATION_EMAIL_SUBJECT,
-                                 emails.generate_activation_email(serializer.validated_data.get('email')),
+                if request.headers.get('Accept-Language') == 'ru-ru':
+                    subject = constants.ACTIVATION_EMAIL_SUBJECT_RU
+                else:
+                    subject = constants.ACTIVATION_EMAIL_SUBJECT_EN
+                send_email.delay(subject,
+                                 emails.generate_activation_email(
+                                     serializer.validated_data.get('email'),
+                                     request.headers.get('Accept-Language')
+                                 ),
                                  serializer.validated_data.get('email'))
                 return Response({
                     'emailed': True
@@ -134,11 +141,13 @@ class UserViewSet(viewsets.GenericViewSet,
             if request.headers.get('Accept-Language') == 'ru-ru':
                 files.append('documents/visualization_board_ru.pdf')
                 files.append('documents/to-do_list_ru.pdf')
+                subject = constants.PREMIUM_EMAIL_SUBJECT_RU
             else:
                 files.append('documents/visualization_board_en.pdf')
                 files.append('documents/to-do_list_en.pdf')
-            send_email.delay('Premium purchased',
-                             'You have successfully purchased premium\n',
+                subject = constants.PREMIUM_EMAIL_SUBJECT_EN
+            send_email.delay(subject,
+                             emails.generate_premium_email(request.headers.get('Accept-Language')),
                              request.user.email,
                              files)
             return Response()
