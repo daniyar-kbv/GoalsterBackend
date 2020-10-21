@@ -88,6 +88,13 @@ OBSERVATION_EMAIL_BODY_END_EN = '''Don't forget to follow us on Instagram if you
 
 You can contact us at any time.  We value our clients and will not disregard your request.'''
 
+LINK_HINT_RU = '''* если ссылка не открывает приложение, зажмите ссылку, пока не появится лист действий,
+а затем выберите опцию с надписью "Открыть в "Goalsters""
+'''
+LINK_HINT_EN = '''* if link doesn't open the app, long press the link until an action sheet comes up, 
+then select the option that says "Open in "Goalsters""
+'''
+
 DATETIME_FORMAT = '%d-%m-%Y %H:%M:%S'
 DATE_FORMAT = '%d-%m-%Y'
 

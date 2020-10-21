@@ -55,7 +55,7 @@ class UserViewSet(viewsets.GenericViewSet,
 
     @action(detail=True, methods=['get'], name='verify-email')
     def verify_email(self, request, pk=None):
-        email = encryption.decrypt(pk)
+        email = pk
         try:
             user = MainUser.objects.get(email=email)
         except:

@@ -1,5 +1,4 @@
-from utils import encryption, deeplinks
-from users.views import UserViewSet
+from utils import deeplinks
 
 import constants
 
@@ -8,12 +7,16 @@ def generate_activation_email(email, language):
     if language == 'ru-ru':
         start = constants.ACTIVATION_EMAIL_BODY_START_RU
         end = constants.ACTIVATION_EMAIL_BODY_END_RU
+        hint = constants.LINK_HINT_RU
     else:
         start = constants.ACTIVATION_EMAIL_BODY_START_EN
         end = constants.ACTIVATION_EMAIL_BODY_END_EN
+        hint = constants.LINK_HINT_EN
     return f"""{start}
 
-{deeplinks.construct_link(constants.DEEPLINK_AUTH, email=encryption.encrypt(email))}
+{deeplinks.construct_link(constants.DEEPLINK_AUTH, email=email)}
+
+{hint}
 
 {end}"""
 
@@ -31,11 +34,15 @@ def generate_observation_confirmation_email(email, language):
     if language == 'ru-ru':
         start = constants.OBSERVATION_EMAIL_BODY_START_RU
         end = constants.OBSERVATION_EMAIL_BODY_END_RU
+        hint = constants.LINK_HINT_RU
     else:
         start = constants.OBSERVATION_EMAIL_BODY_START_EN
         end = constants.OBSERVATION_EMAIL_BODY_END_EN
+        hint = constants.LINK_HINT_EN
     return f"""{start}
     
 {deeplinks.construct_link(constants.DEEPLINK_PREMIUM, email=email)}
+
+{hint}
     
 {end}"""
