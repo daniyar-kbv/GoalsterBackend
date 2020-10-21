@@ -9,7 +9,7 @@ class UserSendActivationEmailSerializer(serializers.Serializer):
 
 
 class UserVerifyActivationEmailSerializer(serializers.Serializer):
-    email = serializers.CharField()
+    email = serializers.EmailField()
 
 
 class UserShortSerializer(serializers.ModelSerializer):

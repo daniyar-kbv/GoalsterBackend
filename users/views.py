@@ -13,7 +13,7 @@ from users.serializers import UserSendActivationEmailSerializer, UserShortSerial
 from main.tasks import after_three_days, send_email
 from main.models import SelectedSphere, Observation, UserResults
 from main.serializers import UserResultsSerializer
-from utils import encryption, response, permissions, emails, general, auth
+from utils import encoding, response, permissions, emails, general, auth
 import constants, datetime
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -55,7 +55,10 @@ class UserViewSet(viewsets.GenericViewSet,
 
     @action(detail=True, methods=['get'], name='verify-email')
     def verify_email(self, request, pk=None):
-        email = pk
+        try:
+            email = encoding.decode(int(pk))
+        except:
+            return Response(response.make_messages([_('The used link is invalid')]), status.HTTP_400_BAD_REQUEST)
         try:
             user = MainUser.objects.get(email=email)
         except:

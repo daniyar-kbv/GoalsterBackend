@@ -1,4 +1,4 @@
-from utils import deeplinks
+from utils import deeplinks, encoding
 
 import constants
 
@@ -14,7 +14,7 @@ def generate_activation_email(email, language):
         hint = constants.LINK_HINT_EN
     return f"""{start}
 
-{deeplinks.construct_link(constants.DEEPLINK_AUTH, email=email)}
+{deeplinks.construct_link(constants.DEEPLINK_AUTH, email=encoding.encode(email))}
 
 {hint}
 
