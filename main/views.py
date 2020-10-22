@@ -11,8 +11,8 @@ from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAd
     VisualizationListSerializer, SelectedSphereSerializer, ObservedListSerializer, ObserversListSerializer, \
     ObservationAcceptSerializer, HelpCreateSerializer, UpdateSpheresSerializer
 from main.tasks import send_email
-from utils import permissions, response
-import datetime, constants, PIL
+from utils import permissions, response, deeplinks, encoding
+import datetime, constants, PIL, requests
 
 
 class SphereViewSet(viewsets.GenericViewSet):
@@ -60,14 +60,8 @@ class SphereViewSet(viewsets.GenericViewSet):
 
     # @action(detail=False, methods=['post'])
     # def test(self, request, pk=None):
-    #     if request.headers.get('Accept-Language') == 'ru-ru':
-    #         file = 'documents/visualization_desk_ru.pdf'
-    #     else:
-    #         file = 'documents/visualization_desk_en.pdf'
-    #     send_email.delay('Premium purchased',
-    #                      'You have successfully purchased premium\n',
-    #                      request.user.email,
-    #                      [file])
+    #     link = deeplinks.construct_link_v2(constants.DEEPLINK_AUTH, email=encoding.encode('daniyar_k-98@mail.ru'))
+    #     print(link)
     #     return Response()
 
 

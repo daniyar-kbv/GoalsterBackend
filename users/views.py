@@ -53,6 +53,34 @@ class UserViewSet(viewsets.GenericViewSet,
                 })
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['post'], name='send_activation_email')
+    def send_activation_email_v2(self, request, pk=None):
+        serializer = UserSendActivationEmailSerializer(data=request.data)
+        if serializer.is_valid():
+            if serializer.validated_data.get('email') == constants.APPLE_TEST_EMAIL:
+                try:
+                    user = MainUser.objects.get(email=serializer.validated_data.get('email'))
+                except:
+                    return Response({
+                        'emailed': True
+                    })
+                return Response(auth.auth_user_data(user, request))
+            else:
+                if request.headers.get('Accept-Language') == 'ru-ru':
+                    subject = constants.ACTIVATION_EMAIL_SUBJECT_RU
+                else:
+                    subject = constants.ACTIVATION_EMAIL_SUBJECT_EN
+                send_email.delay(subject,
+                                 emails.generate_activation_email_v2(
+                                     serializer.validated_data.get('email'),
+                                     request.headers.get('Accept-Language')
+                                 ),
+                                 serializer.validated_data.get('email'))
+                return Response({
+                    'emailed': True
+                })
+        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+
     @action(detail=True, methods=['get'], name='verify-email')
     def verify_email(self, request, pk=None):
         try:

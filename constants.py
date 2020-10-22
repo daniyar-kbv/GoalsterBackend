@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+import os
 
 LANGUAGE_RUSSIAN = 1
 LANGUAGE_ENGLISH = 2
@@ -133,6 +134,9 @@ FIREBASE_DEEPLINKS_LINK = 'https://goalsterapp.com'
 FIREBASE_DEEPLINKS_ISI = '1532862482'
 FIREBASE_DEEPLINKS_IBI = 'com.goalster.app'
 FIREBASE_DEEPLINKS_EFR = '1'
+FIREBASE_DEEPLINKS_DOMAIN = 'app.goalsterapp.com'
+
+FIREBASE_SHORT_LINK_URL = f'https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key={os.environ.get("FIREBASE_API_KEY")}'
 
 DEEPLINK_AUTH = 1
 DEEPLINK_PREMIUM = 2
