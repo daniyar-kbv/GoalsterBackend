@@ -21,6 +21,22 @@ services:
     - rabbit
     env_file:
     - ./.env.prod
+  celery2:
+    build: .
+    command: celery -A goalster worker --pool=solo -l info
+    depends_on:
+    - db
+    - rabbit
+    env_file:
+    - ./.env.prod
+  celery3:
+    build: .
+    command: celery -A goalster worker --pool=solo -l info
+    depends_on:
+    - db
+    - rabbit
+    env_file:
+    - ./.env.prod
   db:
     image: postgres
     volumes:

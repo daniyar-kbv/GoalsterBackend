@@ -13,7 +13,15 @@ services:
     - ./rabbit.conf:/etc/rabbit/rabbitmq.conf
     env_file:
     - ./.env.rabbit
-  celery:
+  celery1:
+    build: .
+    command: celery -A goalster worker --pool=solo -l info
+    depends_on:
+    - db
+    - rabbit
+    env_file:
+    - ./.env.dev
+  celery2:
     build: .
     command: celery -A goalster worker --pool=solo -l info
     depends_on:
