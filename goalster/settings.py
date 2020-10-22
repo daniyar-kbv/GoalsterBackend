@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'utils.middleware.TimezoneMiddleware'
 ]
 
 ROOT_URLCONF = 'goalster.urls'

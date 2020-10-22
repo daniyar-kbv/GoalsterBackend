@@ -10,8 +10,8 @@ from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAd
     UserAnswerListSerializer, VisualizationCreateSerializer, \
     VisualizationListSerializer, SelectedSphereSerializer, ObservedListSerializer, ObserversListSerializer, \
     ObservationAcceptSerializer, HelpCreateSerializer, UpdateSpheresSerializer
-from main.tasks import send_email, test
-from utils import permissions, response, deeplinks, encoding
+from main.tasks import send_email
+from utils import permissions, response, deeplinks, encoding, time
 import datetime, constants, PIL, requests
 
 
@@ -58,10 +58,11 @@ class SphereViewSet(viewsets.GenericViewSet):
                 'spheres': serializer_data
             })
 
-    @action(detail=False, methods=['post'])
-    def test(self, request, pk=None):
-        test.delay()
-        return Response()
+    # @action(detail=False, methods=['post'])
+    # def test(self, request, pk=None):
+    #     from main.tasks import reset_spheres
+    #     print(timezone.now())
+    #     return Response()
 
 
 class GoalViewSet(viewsets.GenericViewSet,
@@ -88,7 +89,7 @@ class GoalViewSet(viewsets.GenericViewSet,
         if date_str:
             date = datetime.datetime.strptime(date_str, constants.DATE_FORMAT).date()
         else:
-            date = timezone.now().date()
+            date = time.get_local_dt().date()
         queryset = queryset.filter(date=date)
         context = {
             'user': user
@@ -170,7 +171,7 @@ class GoalViewSet(viewsets.GenericViewSet,
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def today(self, request, pk=None):
         queryset = self.filter_queryset(self.get_queryset())
-        date = timezone.now().date()
+        date = time.get_local_dt().date()
         queryset = queryset.filter(date=date, user=request.user)
         context = {
             'user': request.user
