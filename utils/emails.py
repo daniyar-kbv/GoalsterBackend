@@ -64,3 +64,21 @@ def generate_observation_confirmation_email(email, language):
 {hint}
     
 {end}"""
+
+
+def generate_observation_confirmation_email_v2(email, language):
+    if language == 'ru-ru':
+        start = constants.OBSERVATION_EMAIL_BODY_START_RU
+        end = constants.OBSERVATION_EMAIL_BODY_END_RU
+        hint = constants.LINK_HINT_RU
+    else:
+        start = constants.OBSERVATION_EMAIL_BODY_START_EN
+        end = constants.OBSERVATION_EMAIL_BODY_END_EN
+        hint = constants.LINK_HINT_EN
+    return f"""{start}
+
+{deeplinks.construct_link_v2(constants.DEEPLINK_PREMIUM, email=email)}
+
+{hint}
+
+{end}"""

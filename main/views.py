@@ -10,7 +10,7 @@ from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAd
     UserAnswerListSerializer, VisualizationCreateSerializer, \
     VisualizationListSerializer, SelectedSphereSerializer, ObservedListSerializer, ObserversListSerializer, \
     ObservationAcceptSerializer, HelpCreateSerializer, UpdateSpheresSerializer
-from main.tasks import send_email
+from main.tasks import send_email, reset_spheres
 from utils import permissions, response, deeplinks, encoding, time
 import datetime, constants, PIL, requests
 
@@ -58,11 +58,10 @@ class SphereViewSet(viewsets.GenericViewSet):
                 'spheres': serializer_data
             })
 
-    # @action(detail=False, methods=['post'])
-    # def test(self, request, pk=None):
-    #     from main.tasks import reset_spheres
-    #     print(timezone.now())
-    #     return Response()
+    @action(detail=False, methods=['post'])
+    def test(self, request, pk=None):
+        reset_spheres.delay(25)
+        return Response()
 
 
 class GoalViewSet(viewsets.GenericViewSet,
@@ -147,6 +146,19 @@ class GoalViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def add(self, request, pk=None):
+        context = {
+            'user': request.user,
+            'observer': request.data.pop('observer') if request.data.get('observer') else None,
+            'request': request
+        }
+        serializer = GoalAddSerializer(data=request.data, context=context)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response()
+        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def add_v2(self, request, pk=None):
         context = {
             'user': request.user,
             'observer': request.data.pop('observer') if request.data.get('observer') else None,

@@ -31,16 +31,24 @@ def observation_saved(sender, instance, created=True, **kwargs):
         attrs_needed = ['_request', '_created']
         if all(hasattr(instance, attr) for attr in attrs_needed):
             if instance._created:
-                if instance._request.headers.get('Accept-Language') == 'ru-ru':
-                    subject = constants.OBSERVATION_EMAIL_SUBJECT_RU
-                else:
-                    subject = constants.OBSERVATION_EMAIL_SUBJECT_EN
-                send_email.delay(subject,
-                                 emails.generate_observation_confirmation_email(
-                                     instance.observer.email,
-                                     instance._request.headers.get('Accept-Language')
-                                 ),
-                                 instance.observer.email)
+                if Observation.objects.filter(observed=instance.observed, observer=instance.observer).count() == 1:
+                    if instance.observer.language == constants.LANGUAGE_RUSSIAN:
+                        subject = constants.OBSERVATION_EMAIL_SUBJECT_RU
+                    else:
+                        subject = constants.OBSERVATION_EMAIL_SUBJECT_EN
+                    if instance._request.path.__contains__('v2'):
+                        body = emails.generate_observation_confirmation_email_v2(
+                                         instance.observer.email,
+                                         'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us'
+                                     )
+                    else:
+                        body = emails.generate_observation_confirmation_email(
+                            instance.observer.email,
+                            'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us'
+                        )
+                    send_email.delay(subject,
+                                     body,
+                                     instance.observer.email)
 
 
 @receiver(post_save, sender=UserAnswer)
