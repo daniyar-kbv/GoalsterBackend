@@ -58,10 +58,10 @@ class SphereViewSet(viewsets.GenericViewSet):
                 'spheres': serializer_data
             })
 
-    @action(detail=False, methods=['post'])
-    def test(self, request, pk=None):
-        reset_spheres.delay(25)
-        return Response()
+    # @action(detail=False, methods=['post'])
+    # def test(self, request, pk=None):
+    #     reset_spheres.delay(25)
+    #     return Response()
 
 
 class GoalViewSet(viewsets.GenericViewSet,

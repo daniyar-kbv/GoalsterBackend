@@ -96,9 +96,9 @@ class GoalAddSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context.get('request').user
-        if Goal.objects.filter(user=user, date=validated_data.get('date')).count() >= 6 and not user.is_premium:
+        if Goal.objects.filter(user=user, date=validated_data.get('date')).count() >= 9 and not user.is_premium:
             raise serializers.ValidationError(
-                response.make_messages([_('You have to be premium member to add more than 6 goals to one day')])
+                response.make_messages([_('You have to be premium member to add more than 9 goals to one day')])
             )
         goal = Goal.objects.create(**validated_data)
         if validated_data.get('is_shared'):
