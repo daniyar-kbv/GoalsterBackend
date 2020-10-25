@@ -65,17 +65,17 @@ def visualization_pre_deleted(sender, instance, created=True, **kwargs):
         upload.delete_folder(instance.image)
 
 
-@receiver(post_save, sender=Help)
-def help_saved(sender, instance, created=True, **kwargs):
-    if created:
-        sent = send_email(
-            'Помощь GOALSTERS',
-            f"""От: {instance.user.email}
-            
-{instance.text}
-            
-{instance.created_at.strftime(constants.DATETIME_FORMAT)}""",
-            constants.HELP_RECIPIENT_EMAIL
-        )
-        instance.is_sent = sent
-        instance.save()
+# @receiver(post_save, sender=Help)
+# def help_saved(sender, instance, created=True, **kwargs):
+#     if created:
+#         sent = send_email(
+#             'Помощь GOALSTERS',
+#             f"""От: {instance.user.email}
+#
+# {instance.text}
+#
+# {instance.created_at.strftime(constants.DATETIME_FORMAT)}""",
+#             constants.HELP_RECIPIENT_EMAIL
+#         )
+#         instance.is_sent = sent
+#         instance.save()
