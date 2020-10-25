@@ -19,5 +19,5 @@ class GoalAdmin(admin.ModelAdmin):
 class HelpAdmin(admin.ModelAdmin):
     list_display = ('id', 'text', 'user', 'created_at')
     search_fields = ['text', 'user']
-    list_filter = ['created_at']
+    list_filter = ['created_at', 'is_sent']
     autocomplete_fields = ['user']

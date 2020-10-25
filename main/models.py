@@ -150,6 +150,7 @@ class Help(models.Model):
                              verbose_name=_('User'))
     text = models.TextField(_('Text'))
     created_at = models.DateTimeField(_('Creation date'), auto_now_add=True, blank=True)
+    is_sent = models.BooleanField(_('Sent'), default=False, blank=True)
 
     class Meta:
         verbose_name = _('Help')

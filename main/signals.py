@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
-from main.models import SelectedSphere, Observation, UserAnswer, Visualization
+from main.models import SelectedSphere, Observation, UserAnswer, Visualization, Help
 from main.tasks import reset_spheres, send_email, delete_emoton, notify_before
 from utils import emails, upload, time
 from dateutil.relativedelta import relativedelta
@@ -63,3 +63,19 @@ def answer_saved(sender, instance, created=True, **kwargs):
 def visualization_pre_deleted(sender, instance, created=True, **kwargs):
     if instance.image:
         upload.delete_folder(instance.image)
+
+
+@receiver(post_save, sender=Help)
+def help_saved(sender, instance, created=True, **kwargs):
+    if created:
+        sent = send_email(
+            'Помощь GOALSTERS',
+            f"""От: {instance.user.email}
+            
+{instance.text}
+            
+{instance.created_at.strftime(constants.DATETIME_FORMAT)}""",
+            constants.HELP_RECIPIENT_EMAIL
+        )
+        instance.is_sent = sent
+        instance.save()

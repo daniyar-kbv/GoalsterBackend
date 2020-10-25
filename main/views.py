@@ -58,10 +58,21 @@ class SphereViewSet(viewsets.GenericViewSet):
                 'spheres': serializer_data
             })
 
-    # @action(detail=False, methods=['post'])
-    # def test(self, request, pk=None):
-    #     reset_spheres.delay(25)
-    #     return Response()
+#     @action(detail=False, methods=['post'])
+#     def test(self, request, pk=None):
+#         for help_ in Help.objects.filter(is_sent=False):
+#             sent = send_email(
+#                 'Помощь GOALSTERS',
+#                 f"""От: {help_.user.email}
+#
+# {help_.text}
+#
+# {help_.created_at.strftime(constants.DATETIME_FORMAT)}""",
+#                 constants.HELP_RECIPIENT_EMAIL
+#             )
+#             help_.is_sent = sent
+#             help_.save()
+#         return Response()
 
 
 class GoalViewSet(viewsets.GenericViewSet,

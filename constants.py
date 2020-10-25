@@ -142,3 +142,5 @@ DEEPLINK_AUTH = 1
 DEEPLINK_PREMIUM = 2
 
 APPLE_TEST_EMAIL = 'jan.e.r.ebe.c.ca.lynn.tm.p@gmail.com'
+
+HELP_RECIPIENT_EMAIL = 'daniyar_k-98@mail.ru'
