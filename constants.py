@@ -143,3 +143,7 @@ DEEPLINK_PREMIUM = 2
 APPLE_TEST_EMAIL = 'jan.e.r.ebe.c.ca.lynn.tm.p@gmail.com'
 
 HELP_RECIPIENT_EMAIL = 'daniyar_k-98@mail.ru'
+
+PURCHASE_ONE_MONTH = 'com.goalsterapp.onemonth'
+PURCHASE_THREE_MONTH = 'com.goalsterapp.threemonth'
+PURCHASE_ONE_YEAR = 'com.goalsterapp.oneyear'

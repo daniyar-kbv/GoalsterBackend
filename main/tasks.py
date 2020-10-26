@@ -6,8 +6,9 @@ from django.conf import settings
 from users.models import MainUser, Transaction
 from main.models import SelectedSphere, UserAnswer, UserResults, Goal
 from utils.notifications import send_notification
+from dateutil.relativedelta import relativedelta
 import os
-import logging, constants
+import logging, constants, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -36,20 +37,22 @@ def send_email(subject, body, to, attachments=None, count=0):
 
 
 @shared_task
-def reset_spheres(user_id):
-    try:
-        user = MainUser.objects.get(id=user_id)
-    except:
-        return
-    spheres = SelectedSphere.objects.filter(user=user)
-    existing_results = UserResults.objects.filter(user=user)
-    existing_results.delete()
-    for sphere in spheres:
-        UserResults.objects.create(user=user,
-                                   sphere_name=sphere.sphere,
-                                   number=Goal.objects.filter(user=user, sphere=sphere, is_done=True).count())
-    spheres.delete()
-    send_notification(user, constants.NOTIFICATION_END)
+def check_reset_spheres():
+    for user in MainUser.objects.all():
+        sphere = SelectedSphere.objects.filter(user=user).first()
+        if sphere:
+            if sphere.expires_at.date() == datetime.date.today():
+                spheres = SelectedSphere.objects.filter(user=user)
+                existing_results = UserResults.objects.filter(user=user)
+                existing_results.delete()
+                for sphere in spheres:
+                    UserResults.objects.create(user=user,
+                                               sphere_name=sphere.sphere,
+                                               number=Goal.objects.filter(user=user, sphere=sphere, is_done=True).count())
+                spheres.delete()
+                send_notification(user, constants.NOTIFICATION_END)
+            elif sphere.expires_at.date() == datetime.date.today() - datetime.timedelta(days=3):
+                send_notification(user, constants.NOTIFICATION_BEFORE_END)
 
 
 @shared_task
@@ -75,20 +78,22 @@ def after_three_days(user_id):
 
 
 @shared_task
-def notify_before(user_id):
-    try:
-        user = MainUser.objects.get(id=user_id)
-    except:
-        return
-    send_notification(user, constants.NOTIFICATION_BEFORE_END)
+def check_premium():
+    for user in MainUser.objects.all():
+        if user.is_premium:
+            last_transaction = Transaction.objects.filter(user=user).order_by('-created_at').first()
+            if last_transaction:
+                if last_transaction.product_id == constants.PURCHASE_ONE_MONTH \
+                and relativedelta(datetime.date.today(), last_transaction.created_at.date()).months > 0:
+                    user.is_premium = False
+                    user.save()
+                elif last_transaction.product_id == constants.PURCHASE_THREE_MONTH \
+                and relativedelta(datetime.date.today(), last_transaction.created_at.date()).months > 2:
+                    user.is_premium = False
+                    user.save()
+                elif last_transaction.product_id == constants.PURCHASE_ONE_YEAR \
+                and relativedelta(datetime.date.today(), last_transaction.created_at.date()).years > 0:
+                    user.is_premium = False
+                    user.save()
 
 
-@shared_task
-def deactivate_premium(user_id, transaction_id):
-    try:
-        user = MainUser.objects.get(id=user_id)
-    except:
-        return
-    if Transaction.objects.filter(user=user).first().id == transaction_id:
-        user.is_premium = False
-        user.save()

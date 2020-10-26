@@ -10,7 +10,7 @@ from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAd
     UserAnswerListSerializer, VisualizationCreateSerializer, \
     VisualizationListSerializer, SelectedSphereSerializer, ObservedListSerializer, ObserversListSerializer, \
     ObservationAcceptSerializer, HelpCreateSerializer, UpdateSpheresSerializer
-from main.tasks import send_email, reset_spheres
+from main.tasks import send_email
 from utils import permissions, response, deeplinks, encoding, time
 import datetime, constants, PIL, requests
 
@@ -60,7 +60,11 @@ class SphereViewSet(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['post'])
     def test(self, request, pk=None):
-        print(deeplinks.construct_link_v3(constants.DEEPLINK_AUTH, 'daniyar_k-98@mail.ru'))
+        from dateutil.relativedelta import relativedelta
+        print(relativedelta(datetime.date.today(), datetime.date(year=2020, month=2, day=1)).years)
+        # print(relativedelta(days=11226))
+        # print(relativedelta(datetime.date.today(), datetime.date(year=1990, month=2, day=1)).years == relativedelta(years=+30, months=+8, days=+26).years)
+
         return Response()
 
 

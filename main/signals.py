@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from main.models import SelectedSphere, Observation, UserAnswer, Visualization, Help
-from main.tasks import reset_spheres, send_email, delete_emoton, notify_before
+from main.tasks import send_email, delete_emoton
 from utils import emails, upload, time
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
@@ -15,9 +15,6 @@ def sphere_saved(sender, instance, created=True, **kwargs):
     if created:
         instance.expires_at = (instance.created_at + relativedelta(days=30))
         instance.save()
-        if SelectedSphere.objects.filter(user=instance.user).count() == 1:
-            reset_spheres.apply_async(args=[instance.user.id], eta=instance.expires_at)
-            notify_before.apply_async(args=[instance.user.id], eta=instance.expires_at - datetime.timedelta(days=3))
 
 
 @receiver(post_save, sender=Observation)

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os, datetime, sys
+from celery.schedules import crontab
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'corsheaders',
+    'django_celery_beat',
 
     'main',
     'users',
@@ -138,6 +140,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CELERY_BROKER_URL = os.environ.get('BROKER_URL', 'amqp://localhost')
 CELERY_IGNORE_RESULT = False
 CELERY_RESULT_BACKEND = 'amqp'
+
+CELERY_BEAT_SCHEDULE = {
+    'check_spheres': {
+       'task': 'main.tasks.check_reset_spheres',
+       'schedule': crontab(hour=0, minute=0),
+    },
+    'check_premium': {
+       'task': 'main.tasks.check_premium',
+       'schedule': crontab(hour=0, minute=0),
+    }
+}
 
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'translations', 'locale'),

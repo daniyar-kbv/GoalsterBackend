@@ -37,6 +37,14 @@ services:
     - rabbit
     env_file:
     - ./.env.prod
+  celery_beat:
+    build: .
+    command: celery -A goalster beat -l info
+    depends_on:
+    - db
+    - rabbit
+    env_file:
+    - ./.env.prod
   db:
     image: postgres
     volumes:
