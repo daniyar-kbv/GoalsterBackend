@@ -6,7 +6,6 @@ def construct_link(link_type, email=None):
            f'?link={constants.FIREBASE_DEEPLINKS_LINK}' \
            f'&isi={constants.FIREBASE_DEEPLINKS_ISI}' \
            f'&ibi={constants.FIREBASE_DEEPLINKS_IBI}' \
-           f'&efr={constants.FIREBASE_DEEPLINKS_EFR}' \
            f'&type={link_type}'
     if email:
         link += f'&email={email}'
@@ -14,14 +13,7 @@ def construct_link(link_type, email=None):
 
 
 def construct_link_v2(link_type, email=None):
-    link = f'{constants.FIREBASE_DEEPLINKS_PREFIX}' \
-           f'?link={constants.FIREBASE_DEEPLINKS_LINK}' \
-           f'&isi={constants.FIREBASE_DEEPLINKS_ISI}' \
-           f'&ibi={constants.FIREBASE_DEEPLINKS_IBI}' \
-           f'&efr={constants.FIREBASE_DEEPLINKS_EFR}' \
-           f'&type={link_type}'
-    if email:
-        link += f'&email={email}'
+    link = construct_link(link_type, email)
     response = requests.post(
         constants.FIREBASE_SHORT_LINK_URL,
         json={
