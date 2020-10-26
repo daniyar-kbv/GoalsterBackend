@@ -39,6 +39,24 @@ def generate_activation_email_v2(email, language):
 {end}"""
 
 
+def generate_activation_email_v3(email, language):
+    if language == 'ru-ru':
+        start = constants.ACTIVATION_EMAIL_BODY_START_RU
+        end = constants.ACTIVATION_EMAIL_BODY_END_RU
+        hint = constants.LINK_HINT_RU
+    else:
+        start = constants.ACTIVATION_EMAIL_BODY_START_EN
+        end = constants.ACTIVATION_EMAIL_BODY_END_EN
+        hint = constants.LINK_HINT_EN
+    return f"""{start}
+
+{deeplinks.construct_link_v3(constants.DEEPLINK_AUTH, email=encoding.encode(email))}
+
+{hint}
+
+{end}"""
+
+
 def generate_premium_email(language):
     if language == 'ru-ru':
         body = constants.PREMIUM_EMAIL_BODY_RU
@@ -78,6 +96,24 @@ def generate_observation_confirmation_email_v2(email, language):
     return f"""{start}
 
 {deeplinks.construct_link_v2(constants.DEEPLINK_PREMIUM, email=email)}
+
+{hint}
+
+{end}"""
+
+
+def generate_observation_confirmation_email_v3(email, language):
+    if language == 'ru-ru':
+        start = constants.OBSERVATION_EMAIL_BODY_START_RU
+        end = constants.OBSERVATION_EMAIL_BODY_END_RU
+        hint = constants.LINK_HINT_RU
+    else:
+        start = constants.OBSERVATION_EMAIL_BODY_START_EN
+        end = constants.OBSERVATION_EMAIL_BODY_END_EN
+        hint = constants.LINK_HINT_EN
+    return f"""{start}
+
+{deeplinks.construct_link_v3(constants.DEEPLINK_PREMIUM, email=email)}
 
 {hint}
 

@@ -58,21 +58,10 @@ class SphereViewSet(viewsets.GenericViewSet):
                 'spheres': serializer_data
             })
 
-#     @action(detail=False, methods=['post'])
-#     def test(self, request, pk=None):
-#         for help_ in Help.objects.filter(is_sent=False):
-#             sent = send_email(
-#                 'Помощь GOALSTERS',
-#                 f"""От: {help_.user.email}
-#
-# {help_.text}
-#
-# {help_.created_at.strftime(constants.DATETIME_FORMAT)}""",
-#                 constants.HELP_RECIPIENT_EMAIL
-#             )
-#             help_.is_sent = sent
-#             help_.save()
-#         return Response()
+    @action(detail=False, methods=['post'])
+    def test(self, request, pk=None):
+        print(deeplinks.construct_link_v3(constants.DEEPLINK_AUTH, 'daniyar_k-98@mail.ru'))
+        return Response()
 
 
 class GoalViewSet(viewsets.GenericViewSet,
@@ -170,6 +159,19 @@ class GoalViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def add_v2(self, request, pk=None):
+        context = {
+            'user': request.user,
+            'observer': request.data.pop('observer') if request.data.get('observer') else None,
+            'request': request
+        }
+        serializer = GoalAddSerializer(data=request.data, context=context)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response()
+        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def add_v3(self, request, pk=None):
         context = {
             'user': request.user,
             'observer': request.data.pop('observer') if request.data.get('observer') else None,
