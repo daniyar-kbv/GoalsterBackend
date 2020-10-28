@@ -7,6 +7,9 @@ from utils import response
 class UserSendActivationEmailSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
+    def validate_email(self, value):
+        return value.lower()
+
 
 class UserVerifyActivationEmailSerializer(serializers.Serializer):
     email = serializers.EmailField()
