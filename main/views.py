@@ -60,11 +60,6 @@ class SphereViewSet(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['post'])
     def test(self, request, pk=None):
-        from dateutil.relativedelta import relativedelta
-        print(relativedelta(datetime.date.today(), datetime.date(year=2020, month=2, day=1)).years)
-        # print(relativedelta(days=11226))
-        # print(relativedelta(datetime.date.today(), datetime.date(year=1990, month=2, day=1)).years == relativedelta(years=+30, months=+8, days=+26).years)
-
         return Response()
 
 

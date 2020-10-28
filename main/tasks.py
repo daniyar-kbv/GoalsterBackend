@@ -41,7 +41,7 @@ def check_reset_spheres():
     for user in MainUser.objects.all():
         sphere = SelectedSphere.objects.filter(user=user).first()
         if sphere:
-            if sphere.expires_at.date() == datetime.date.today():
+            if sphere.expires_at.date() <= datetime.date.today():
                 spheres = SelectedSphere.objects.filter(user=user)
                 existing_results = UserResults.objects.filter(user=user)
                 existing_results.delete()

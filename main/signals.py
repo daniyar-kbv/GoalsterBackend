@@ -33,21 +33,16 @@ def observation_saved(sender, instance, created=True, **kwargs):
                         subject = constants.OBSERVATION_EMAIL_SUBJECT_RU
                     else:
                         subject = constants.OBSERVATION_EMAIL_SUBJECT_EN
+                    version = 1
                     if instance._request.path.__contains__('v2'):
-                        body = emails.generate_observation_confirmation_email_v2(
-                                         instance.observer.email,
-                                         'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us'
-                                     )
+                        version = 2
                     elif instance._request.path.__contains__('v3'):
-                        body = emails.generate_observation_confirmation_email_v3(
-                                         instance.observer.email,
-                                         'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us'
-                                     )
-                    else:
-                        body = emails.generate_observation_confirmation_email(
-                            instance.observer.email,
-                            'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us'
-                        )
+                        version = 3
+                    body = emails.generate_observation_confirmation_email(
+                        instance.observer.email,
+                        'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us',
+                        version
+                    )
                     send_email.delay(subject,
                                      body,
                                      instance.observer.email)
