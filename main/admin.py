@@ -12,7 +12,7 @@ class ObservationInline(admin.StackedInline):
 class GoalAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'name', 'date', 'time', 'is_done', 'is_shared')
     inlines = [ObservationInline]
-    search_fields = ['name']
+    search_fields = ['name', 'user']
 
 
 @admin.register(Help)
