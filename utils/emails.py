@@ -20,7 +20,7 @@ def generate_activation_email(email, language, version):
         link = deeplinks.construct_link_v3(constants.DEEPLINK_AUTH, email=encoding.encode(email))
     return f"""{start}
 
-{link)}
+{link}
 
 {hint}
 
