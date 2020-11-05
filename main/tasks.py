@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
+from django.core.management import call_command
 from django.core.mail import EmailMessage
 from django.utils import timezone
 from django.conf import settings
@@ -97,3 +98,7 @@ def check_premium():
                     user.save()
 
 
+@shared_task
+def backup():
+    call_command('dbbackup', '-c')
+    call_command('mediabackup', '-c')

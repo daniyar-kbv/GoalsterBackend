@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'django_celery_beat',
+    'dbbackup',
 
     'main',
     'users',
@@ -149,6 +150,10 @@ CELERY_BEAT_SCHEDULE = {
     'check_premium': {
        'task': 'main.tasks.check_premium',
        'schedule': crontab(hour=0, minute=0),
+    },
+    'backups': {
+        'task': 'main.tasks.backups',
+        'schedule': crontab(hour=0, minute=0)
     }
 }
 
@@ -226,4 +231,20 @@ JWT_AUTH = {
 
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_AUTH_COOKIE': None,
+}
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, 'backups')}
+DBBACKUP_CLEANUP_KEEP = 10
+DBBACKUP_CLEANUP_KEEP_MEDIA = 10
+
+DBBACKUP_CONNECTORS = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST', 'db'),
+        'PORT': os.environ.get('DB_PORT', 5432),
+    }
 }
