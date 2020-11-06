@@ -102,3 +102,9 @@ def check_premium():
 def backup():
     call_command('dbbackup', '-c')
     call_command('mediabackup', '-c')
+    os.system(f'cd backups && \
+              git config --global user.email "{os.environ.get("GITHUB_EMAIL")}" && \
+              git config --global user.name "{os.environ.get("GITHUB_USERNAME")}" && \
+              git add . && \
+              git commit -m "backup" && \
+              git push https://{os.environ.get("GITHUB_USERNAME")}:{os.environ.get("GITHUB_PASSWORD")}@github.com/goalster/{os.environ.get("GITHUB_REPOSITORY")}.git --all')
