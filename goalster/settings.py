@@ -153,7 +153,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'backups': {
         'task': 'main.tasks.backups',
-        'schedule': crontab(hour=0, minute=0)
+        'schedule': crontab(hour=0, minute=0, day_of_month='*/2')
     }
 }
 
@@ -235,8 +235,8 @@ JWT_AUTH = {
 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, 'backups')}
-DBBACKUP_CLEANUP_KEEP = 10
-DBBACKUP_CLEANUP_KEEP_MEDIA = 10
+DBBACKUP_CLEANUP_KEEP = 5
+DBBACKUP_CLEANUP_KEEP_MEDIA = 5
 
 DBBACKUP_CONNECTORS = {
     'default': {
