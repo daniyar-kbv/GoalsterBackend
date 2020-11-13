@@ -13,6 +13,8 @@ services:
     - ./rabbit.conf:/etc/rabbit/rabbitmq.conf
     env_file:
     - ./.env.rabbit
+    logging:
+      driver: none
   celery:
     build: .
     command: celery -A goalster worker --pool=solo -l info
@@ -51,6 +53,8 @@ services:
       - ./.env.dev.db
     ports:
       - "5432:5432"
+    logging:
+      driver: none
   web:
     build: .
     command: sh -c "/wait &&
