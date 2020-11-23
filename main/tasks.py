@@ -6,10 +6,10 @@ from django.utils import timezone
 from django.conf import settings
 from users.models import MainUser, Transaction
 from main.models import SelectedSphere, UserAnswer, UserResults, Goal
-from utils.notifications import send_notification
+from utils.notifications import send_notification, get_topic_text
 from dateutil.relativedelta import relativedelta
 import os
-import logging, constants, datetime
+import logging, constants, datetime, requests
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +92,10 @@ def check_premium():
                 and relativedelta(datetime.date.today(), last_transaction.created_at.date()).months > 2:
                     user.is_premium = False
                     user.save()
+                elif last_transaction.product_id == constants.PURCHASE_SIX_MONTH \
+                and relativedelta(datetime.date.today(), last_transaction.created_at.date()).months > 5:
+                    user.is_premium = False
+                    user.save()
                 elif last_transaction.product_id == constants.PURCHASE_ONE_YEAR \
                 and relativedelta(datetime.date.today(), last_transaction.created_at.date()).years > 0:
                     user.is_premium = False
@@ -108,3 +112,25 @@ def backup():
               git add . && \
               git commit -m "backup" && \
               git push https://{os.environ.get("GITHUB_USERNAME")}:{os.environ.get("GITHUB_PASSWORD")}@github.com/goalster/{os.environ.get("GITHUB_REPOSITORY")}.git --all')
+
+
+@shared_task
+def send_invite_notification():
+    for language in constants.LANGUAGES:
+        count = 0
+        users = MainUser.objects.filter(language=language[0])[count, 100 * (count + 1)]
+        while len(users) > 0:
+            parameters = {
+                'notification': {
+                    'title': get_topic_text(constants.FIREBASE_TOPIC_INVITE, language),
+                    'sound': 'default',
+                    'badge': 1
+                },
+                'tokens': [user.fcm_token for user in users if user.fcm_token]
+            }
+            headers = {
+                'Authorization': f'key={constants.FIREBASE_SERVER_KEY}'
+            }
+            requests.request(method='POST', url=constants.FCM_SEND_URL, json=parameters, headers=headers)
+            count += 1
+            users = MainUser.objects.filter(language=language[0])[count, 100 * (count + 1)]

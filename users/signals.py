@@ -13,7 +13,3 @@ def transaction_created(sender, instance, created=True, **kwargs):
         user = instance.user
         user.is_premium = True
         user.save()
-        if instance.time_unit == constants.MONTH:
-            eta = datetime.datetime.now() + relativedelta(months=instance.time_amount)
-        elif instance.time_unit == constants.YEAR:
-            eta = datetime.datetime.now() + relativedelta(years=instance.time_amount)

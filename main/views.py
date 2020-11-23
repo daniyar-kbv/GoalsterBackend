@@ -58,9 +58,11 @@ class SphereViewSet(viewsets.GenericViewSet):
                 'spheres': serializer_data
             })
 
-    @action(detail=False, methods=['post'])
-    def test(self, request, pk=None):
-        return Response()
+    # @action(detail=False, methods=['post'])
+    # def test(self, request, pk=None):
+    #     from utils.notifications import get_topic_text
+    #     print(get_topic_text(constants.FIREBASE_TOPIC_INVITE, constants.LANGUAGE_RUSSIAN))
+    #     return Response()
 
 
 class GoalViewSet(viewsets.GenericViewSet,

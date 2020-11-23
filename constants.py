@@ -146,4 +146,10 @@ HELP_RECIPIENT_EMAIL = 'daniyar_k-98@mail.ru'
 
 PURCHASE_ONE_MONTH = 'com.goalsterapp.onemonth'
 PURCHASE_THREE_MONTH = 'com.goalsterapp.threemonth'
+PURCHASE_SIX_MONTH = 'com.goalsterapp.sixmonth'
 PURCHASE_ONE_YEAR = 'com.goalsterapp.oneyear'
+
+FIREBASE_TOPIC_INVITE = 'allUsers'
+
+TOPIC_INVITE_TEXT_EN = 'Invite a friend or become an observer'
+TOPIC_INVITE_TEXT_RU = 'Пригласи друга или стань наблюдателем'

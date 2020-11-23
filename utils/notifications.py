@@ -1,5 +1,7 @@
 import requests, constants
 
+from users.models import MainUser
+
 
 def send_notification(user, type):
     parameters = { 
@@ -26,13 +28,21 @@ def get_texts(type, language):
             return constants.THREE_DAYS_TITLE_RU, constants.THREE_DAYS_BODY_RU
         else:
             return constants.THREE_DAYS_TITLE_EN, constants.THREE_DAYS_BODY_EN
-    if type == constants.NOTIFICATION_BEFORE_END:
+    elif type == constants.NOTIFICATION_BEFORE_END:
         if language == constants.LANGUAGE_RUSSIAN:
             return constants.BEFORE_END_TITLE_RU, constants.BEFORE_END_BODY_RU
         else:
             return constants.BEFORE_END_TITLE_EN, constants.BEFORE_END_BODY_EN
-    if type == constants.NOTIFICATION_END:
+    elif type == constants.NOTIFICATION_END:
         if language == constants.LANGUAGE_RUSSIAN:
             return constants.END_TITLE_RU, constants.END_BODY_RU
         else:
             return constants.END_TITLE_EN, constants.END_BODY_EN
+
+
+def get_topic_text(topic, language):
+    if topic == constants.FIREBASE_TOPIC_INVITE:
+        if language == constants.LANGUAGE_RUSSIAN:
+            return constants.TOPIC_INVITE_TEXT_RU
+        elif language == constants.LANGUAGE_ENGLISH:
+            return constants.TOPIC_INVITE_TEXT_EN
