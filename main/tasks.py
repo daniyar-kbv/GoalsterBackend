@@ -116,21 +116,22 @@ def backup():
 
 @shared_task
 def send_invite_notification():
-    for language in constants.LANGUAGES:
-        count = 0
-        users = MainUser.objects.filter(language=language[0])[count, 100 * (count + 1)]
-        while len(users) > 0:
-            parameters = {
-                'notification': {
-                    'title': get_topic_text(constants.FIREBASE_TOPIC_INVITE, language),
-                    'sound': 'default',
-                    'badge': 1
-                },
-                'tokens': [user.fcm_token for user in users if user.fcm_token]
-            }
-            headers = {
-                'Authorization': f'key={constants.FIREBASE_SERVER_KEY}'
-            }
-            requests.request(method='POST', url=constants.FCM_SEND_URL, json=parameters, headers=headers)
-            count += 1
-            users = MainUser.objects.filter(language=language[0])[count, 100 * (count + 1)]
+    if int(os.environ.get('DEBUG', default=0)) == 0:
+        for language in constants.LANGUAGES:
+            count = 0
+            users = MainUser.objects.filter(language=language[0])[count * 100:100 * (count + 1)]
+            while len(users) > 0:
+                parameters = {
+                    'notification': {
+                        'title': get_topic_text(constants.FIREBASE_TOPIC_INVITE, language),
+                        'sound': 'default',
+                        'badge': 1
+                    },
+                    'tokens': [user.fcm_token for user in users if user.fcm_token]
+                }
+                headers = {
+                    'Authorization': f'key={constants.FIREBASE_SERVER_KEY}'
+                }
+                requests.request(method='POST', url=constants.FCM_SEND_URL, json=parameters, headers=headers)
+                count += 1
+                users = MainUser.objects.filter(language=language[0])[count * 100:100 * (count + 1)]

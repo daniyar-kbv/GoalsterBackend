@@ -60,8 +60,8 @@ class SphereViewSet(viewsets.GenericViewSet):
 
     # @action(detail=False, methods=['post'])
     # def test(self, request, pk=None):
-    #     from utils.notifications import get_topic_text
-    #     print(get_topic_text(constants.FIREBASE_TOPIC_INVITE, constants.LANGUAGE_RUSSIAN))
+    #     from main.tasks import send_invite_notification
+    #     send_invite_notification()
     #     return Response()
 
 

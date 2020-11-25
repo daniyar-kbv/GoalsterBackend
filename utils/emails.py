@@ -7,11 +7,9 @@ def generate_activation_email(email, language, version):
     if language == 'ru-ru':
         start = constants.ACTIVATION_EMAIL_BODY_START_RU
         end = constants.ACTIVATION_EMAIL_BODY_END_RU
-        hint = constants.LINK_HINT_RU
     else:
         start = constants.ACTIVATION_EMAIL_BODY_START_EN
         end = constants.ACTIVATION_EMAIL_BODY_END_EN
-        hint = constants.LINK_HINT_EN
     if version == 1:
         link = deeplinks.construct_link(constants.DEEPLINK_AUTH, email=encoding.encode(email))
     elif version == 2:
@@ -21,8 +19,6 @@ def generate_activation_email(email, language, version):
     return f"""{start}
 
 {link}
-
-{hint}
 
 {end}"""
 
@@ -40,11 +36,9 @@ def generate_observation_confirmation_email(email, language, version):
     if language == 'ru-ru':
         start = constants.OBSERVATION_EMAIL_BODY_START_RU
         end = constants.OBSERVATION_EMAIL_BODY_END_RU
-        hint = constants.LINK_HINT_RU
     else:
         start = constants.OBSERVATION_EMAIL_BODY_START_EN
         end = constants.OBSERVATION_EMAIL_BODY_END_EN
-        hint = constants.LINK_HINT_EN
     if version == 1:
         link = deeplinks.construct_link(constants.DEEPLINK_PREMIUM, email=encoding.encode(email))
     elif version == 2:
@@ -54,7 +48,5 @@ def generate_observation_confirmation_email(email, language, version):
     return f"""{start}
     
 {link}
-
-{hint}
     
 {end}"""
