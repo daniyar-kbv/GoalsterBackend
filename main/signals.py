@@ -38,6 +38,8 @@ def observation_saved(sender, instance, created=True, **kwargs):
                         version = 2
                     elif instance._request.path.__contains__('v3'):
                         version = 3
+                    elif instance._request.path.__contains__('v4'):
+                        version = 4
                     body = emails.generate_observation_confirmation_email(
                         instance.observer.email,
                         'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us',

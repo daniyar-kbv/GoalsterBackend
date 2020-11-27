@@ -11,7 +11,7 @@ from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAd
     VisualizationListSerializer, SelectedSphereSerializer, ObservedListSerializer, ObserversListSerializer, \
     ObservationAcceptSerializer, HelpCreateSerializer, UpdateSpheresSerializer
 from main.tasks import send_email
-from utils import permissions, response, deeplinks, encoding, time
+from utils import permissions, response, deeplinks, encoding, time, general
 import datetime, constants, PIL, requests
 
 
@@ -147,42 +147,19 @@ class GoalViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def add(self, request, pk=None):
-        context = {
-            'user': request.user,
-            'observer': request.data.pop('observer') if request.data.get('observer') else None,
-            'request': request
-        }
-        serializer = GoalAddSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response()
-        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+        return general.add_goal(response)
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def add_v2(self, request, pk=None):
-        context = {
-            'user': request.user,
-            'observer': request.data.pop('observer') if request.data.get('observer') else None,
-            'request': request
-        }
-        serializer = GoalAddSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response()
-        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+        return general.add_goal(request)
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def add_v3(self, request, pk=None):
-        context = {
-            'user': request.user,
-            'observer': request.data.pop('observer') if request.data.get('observer') else None,
-            'request': request
-        }
-        serializer = GoalAddSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response()
-        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+        return general.add_goal(request)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def add_v4(self, request, pk=None):
+        return general.add_goal(request)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated, permissions.OwnerPermission])
     def done(self, request, pk=None):

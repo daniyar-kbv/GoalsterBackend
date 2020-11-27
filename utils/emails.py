@@ -16,6 +16,8 @@ def generate_activation_email(email, language, version):
         link = deeplinks.construct_link_v2(constants.DEEPLINK_AUTH, email=encoding.encode(email))
     elif version == 3:
         link = deeplinks.construct_link_v3(constants.DEEPLINK_AUTH, email=encoding.encode(email))
+    elif version == 4:
+        link = deeplinks.construct_link_v4(constants.DEEPLINK_AUTH, email=encoding.encode(email))
     return f"""{start}
 
 {link}
@@ -45,6 +47,8 @@ def generate_observation_confirmation_email(email, language, version):
         link = deeplinks.construct_link_v2(constants.DEEPLINK_PREMIUM, email=encoding.encode(email))
     elif version == 3:
         link = deeplinks.construct_link_v3(constants.DEEPLINK_PREMIUM, email=encoding.encode(email))
+    elif version == 4:
+        link = deeplinks.construct_link_v4(constants.DEEPLINK_PREMIUM, email=encoding.encode(email))
     return f"""{start}
     
 {link}

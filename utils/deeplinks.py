@@ -53,3 +53,29 @@ def construct_link_v3(link_type, email=None):
         }
     )
     return response.json().get('shortLink')
+
+
+def construct_link_v4(link_type, email=None):
+    link = f'{constants.FIREBASE_DEEPLINKS_LINK_V4}/?type={link_type}'
+    if email:
+        link += f'&email={email}'
+    response = requests.post(
+        constants.FIREBASE_SHORT_LINK_URL,
+        json={
+            "dynamicLinkInfo": {
+                "domainUriPrefix": constants.FIREBASE_DEEPLINKS_DOMAIN_V4,
+                "link": link,
+                "iosInfo": {
+                    "iosBundleId": constants.FIREBASE_DEEPLINKS_IBI_V4,
+                    "iosAppStoreId": constants.FIREBASE_DEEPLINKS_ISI_V4
+                },
+                "navigationInfo": {
+                    "enableForcedRedirect": False,
+                },
+            },
+            "suffix": {
+                "option": "UNGUESSABLE"
+            }
+        }
+    )
+    return response.json().get('shortLink')

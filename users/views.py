@@ -37,6 +37,10 @@ class UserViewSet(viewsets.GenericViewSet,
     def send_activation_email_v3(self, request, pk=None):
         return auth.send_verification_email(request, 3)
 
+    @action(detail=False, methods=['post'], name='send_activation_email_v4')
+    def send_activation_email_v4(self, request, pk=None):
+        return auth.send_verification_email(request, 4)
+
     @action(detail=True, methods=['get'], name='verify-email')
     def verify_email(self, request, pk=None):
         try:

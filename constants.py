@@ -135,6 +135,12 @@ FIREBASE_DEEPLINKS_ISI = '1532862482'
 FIREBASE_DEEPLINKS_IBI = 'com.goalster.app'
 FIREBASE_DEEPLINKS_DOMAIN = 'app.goalsterapp.com'
 
+FIREBASE_DEEPLINKS_PREFIX_V4 = 'https://dynamic.24goalsapp.com/'
+FIREBASE_DEEPLINKS_LINK_V4 = 'https://24goalsapp.com'
+FIREBASE_DEEPLINKS_ISI_V4 = '1532862482'
+FIREBASE_DEEPLINKS_IBI_V4 = 'com.goalster.app'
+FIREBASE_DEEPLINKS_DOMAIN_V4 = 'dynamic.24goalsapp.com'
+
 FIREBASE_SHORT_LINK_URL = f'https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key={os.environ.get("FIREBASE_API_KEY")}'
 
 DEEPLINK_AUTH = 1
