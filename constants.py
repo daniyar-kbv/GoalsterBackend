@@ -127,7 +127,7 @@ BEFORE_END_BODY_EN = 'Are you ready?'
 END_TITLE_EN = 'The 30-day period is coming to an end today!'
 END_BODY_EN = 'Click here and summarize.'
 
-FIREBASE_SERVER_KEY = 'AAAAUR2qWDA:APA91bGLbMhQiCVFSBynt1R4nTtQ2dHeO1XSvfAnZTY_6Khh8xijVrLyWkIUAl_W96xTP1wcvy1TLScgX7pe3iaqlyNxEFQE5FG66I0FPNP-jai1b-IPPnccJOXCtGRM5FmJE7mBF_Yz'
+FIREBASE_SERVER_KEY = os.environ.get('FIREBASE_SERVER_KEY')
 
 FIREBASE_DEEPLINKS_PREFIX = 'https://app.goalsterapp.com/'
 FIREBASE_DEEPLINKS_LINK = 'https://goalsterapp.com'
