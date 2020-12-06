@@ -96,7 +96,4 @@ backups/
 celerybeat-schedule
 celerybeat.pid
 
-# .env.dev
-# .env.dev.db
-# .env.prod
-# .env.rabbit
+

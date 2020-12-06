@@ -60,8 +60,8 @@ class SphereViewSet(viewsets.GenericViewSet):
 
     # @action(detail=False, methods=['post'])
     # def test(self, request, pk=None):
-    #     from main.tasks import send_invite_notification
-    #     send_invite_notification()
+    #     print(datetime.datetime.now())
+    #     print(datetime.datetime.now() + datetime.timedelta(days=1))
     #     return Response()
 
 
