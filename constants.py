@@ -99,7 +99,9 @@ DATE_FORMAT = '%d-%m-%Y'
 
 MAX_REGULAR_FILE_SIZE = 10000000
 
-IMAGE_EXTENSIONS = ['.jpg', '.png', '.jpeg']
+IMAGE_EXTENSIONS = ['.jpg', '.png', '.jpeg', '.jpe', '.jif', '.jfif', '.jfi', '.gif', '.webp', '.tiff', '.tif', '.psd',
+                    '.raw', '.arw', '.cr2', '.nrw', '.k25', '.bmp', '.dib', '.heif', '.heic', '.ind', '.indd', '.indt',
+                    '.jp2', '.j2k', '.jpf', '.jpx', '.jpm', '.mj2']
 
 FCM_SEND_URL = 'https://fcm.googleapis.com/fcm/send'
 

@@ -14,7 +14,6 @@ def custom_exception_handler(exc, context):
             }
         else:
             messages = []
-            print(exc.detail)
             try:
                 for key, value in exc.detail.items():
                     if isinstance(value, dict):

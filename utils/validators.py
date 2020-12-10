@@ -8,9 +8,7 @@ from utils import response
 def validate_file_size(value):
     if value.size > constants.MAX_REGULAR_FILE_SIZE:
         raise ValidationError(
-            response.make_messages([
-                f'{_("Maximum file size is")}: {constants.MAX_REGULAR_FILE_SIZE/1000000}{_("Mb")}'
-            ])
+            f'{_("Maximum file size is")}: {constants.MAX_REGULAR_FILE_SIZE/1000000}{_("Mb")}'
         )
 
 
@@ -18,7 +16,5 @@ def basic_validate_images(value):
     ext = os.path.splitext(value.name)[1]
     if not ext.lower() in constants.IMAGE_EXTENSIONS:
         raise ValidationError(
-            response.make_messages(
-                [f'{_("Allowed extensions")}: {constants.IMAGE_EXTENSIONS}'
-            ])
+            f'{_("Allowed extensions")}: {", ".join(constants.IMAGE_EXTENSIONS)}'
         )
