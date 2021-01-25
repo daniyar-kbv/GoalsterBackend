@@ -4,10 +4,9 @@ services:
     hostname: rabbit
     image: rabbitmq:3-management
     expose:
-    - 5672
+    - 5673
     ports:
-    - "5672:5672"
-    - "15672:15672"
+    - "5673:5672"
     volumes:
     - rabbit:/var/lib/rabbit
     - ./rabbit.conf:/etc/rabbit/rabbitmq.conf
@@ -18,35 +17,33 @@ services:
   celery:
     build: .
     command: celery -A goalster worker --pool=solo -l info
+    volumes:
+    - .:/goalster
     depends_on:
     - db
     - rabbit
     env_file:
-    - ./.env.prod
-  celery2:
+    - ./.env.dev
+  celery1:
     build: .
     command: celery -A goalster worker --pool=solo -l info
+    volumes:
+    - .:/goalster
     depends_on:
     - db
     - rabbit
     env_file:
-    - ./.env.prod
-  celery3:
-    build: .
-    command: celery -A goalster worker --pool=solo -l info
-    depends_on:
-    - db
-    - rabbit
-    env_file:
-    - ./.env.prod
+    - ./.env.dev
   celery_beat:
     build: .
     command: celery -A goalster beat -l info
+    volumes:
+    - .:/goalster
     depends_on:
     - db
     - rabbit
     env_file:
-    - ./.env.prod
+    - ./.env.dev
   db:
     image: postgres
     volumes:
@@ -54,7 +51,7 @@ services:
     env_file:
       - ./.env.dev.db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     logging:
       driver: none
   web:
@@ -63,22 +60,19 @@ services:
       pip install -r requirements.txt &&
       python manage.py compilemessages --locale=ru &&
       python manage.py migrate &&
-      python manage.py collectstatic --no-input --clear &&
-      gunicorn goalster.wsgi:application --bind 0.0.0.0:8990"
+      python manage.py runserver 0:8000"
     volumes:
       - .:/goalster
     ports:
-      - "8990:8990"
+      - "8000:8000"
     depends_on:
       - db
       - rabbit
     links:
       - db
     env_file:
-    - ./.env.prod
+    - ./.env.dev
 
 volumes:
   postgres_data:
-  static_volume:
-  media_volume:
   rabbit:
