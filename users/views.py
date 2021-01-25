@@ -18,6 +18,7 @@ from main.serializers import UserResultsSerializer
 from utils import encoding, response, permissions, emails, general, auth
 import constants, datetime
 
+
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
