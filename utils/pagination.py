@@ -1,0 +1,15 @@
+from rest_framework.response import Response
+from rest_framework import pagination, status
+
+
+class CustomPagination(pagination.PageNumberPagination):
+    page_size = 10
+
+    def get_paginated_response(self, data, additional_data=None):
+        data = {
+            'results': data,
+            'additional_data': additional_data,
+            'page': self.page.number,
+            'total_pages': self.page.paginator.num_pages,
+        }
+        return Response(data, status=status.HTTP_200_OK)

@@ -1,9 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
-from main.models import SelectedSphere, Observation, UserAnswer, Visualization, Help
+from main.models import SelectedSphere, Observation, UserAnswer, Visualization, Help, Comment
 from main.tasks import send_email, delete_emoton
-from utils import emails, upload, time
+from utils import emails, upload, time, notifications
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from PIL import Image
@@ -50,6 +50,12 @@ def observation_saved(sender, instance, created=True, **kwargs):
                                      instance.observer.email)
 
 
+@receiver(pre_delete, sender=Observation)
+def observation_deleted(sender, instance, created=True, **kwargs):
+    comments = Comment.objects.filter(goal=instance.goal)
+    comments.delete()
+
+
 @receiver(post_save, sender=UserAnswer)
 def answer_saved(sender, instance, created=True, **kwargs):
     if created:
@@ -77,3 +83,39 @@ def help_saved(sender, instance, created=True, **kwargs):
         )
         instance.is_sent = sent
         instance.save()
+
+
+@receiver(post_save, sender=Comment)
+def comment_saved(sender, instance, created=True, **kwargs):
+    if created:
+        data = {
+            'date': instance.goal.date.strftime(constants.DATE_FORMAT),
+            'id': instance.goal.id
+        }
+        goal = instance.goal
+        goal.is_new_comment = True
+        goal.save()
+        if instance.is_owner:
+            try:
+                observation = Observation.objects.get(goal=instance.goal)
+            except:
+                return
+            if observation.observer.fcm_token:
+                notifications.send_user_notification(
+                    observation.observer,
+                    constants.NEW_COMMENT_EN
+                    if observation.observer.language == constants.LANGUAGE_ENGLISH else
+                    constants.NEW_COMMENT_RU,
+                    instance.text,
+                    data
+                )
+        else:
+            if instance.goal.user.fcm_token:
+                notifications.send_user_notification(
+                    instance.goal.user,
+                    constants.NEW_COMMENT_EN
+                    if instance.goal.user.language == constants.LANGUAGE_ENGLISH else
+                    constants.NEW_COMMENT_RU,
+                    instance.text,
+                    data
+                )

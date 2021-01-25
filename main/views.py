@@ -5,19 +5,26 @@ from rest_framework import viewsets, mixins
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from main.models import Goal, Observation, Visualization, UserAnswer, SelectedSphere, Help
+from main.models import Goal, Observation, Visualization, UserAnswer, SelectedSphere, Help, Comment
 from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAddSerializer, AddEmotionSerializer, \
     UserAnswerListSerializer, VisualizationCreateSerializer, \
     VisualizationListSerializer, SelectedSphereSerializer, ObservedListSerializer, ObserversListSerializer, \
-    ObservationAcceptSerializer, HelpCreateSerializer, UpdateSpheresSerializer
+    ObservationAcceptSerializer, HelpCreateSerializer, UpdateSpheresSerializer, CommentCreateSerializer, \
+    CommentListSerializer
 from main.tasks import send_email
 from utils import permissions, response, deeplinks, encoding, time, general
 import datetime, constants, PIL, requests
 
 
-class SphereViewSet(viewsets.GenericViewSet):
+class SphereViewSet(viewsets.GenericViewSet,
+                    mixins.UpdateModelMixin):
     queryset = SelectedSphere.objects.all()
     pagination_class = None
+
+    def get_serializer_class(self):
+        if self.action == 'update':
+            return UpdateSpheresSerializer
+        return UpdateSpheresSerializer
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def choose_spheres(self, request, pk=None):
@@ -58,15 +65,16 @@ class SphereViewSet(viewsets.GenericViewSet):
                 'spheres': serializer_data
             })
 
-    # @action(detail=False, methods=['post'])
-    # def test(self, request, pk=None):
-    #     print(datetime.datetime.now())
-    #     print(datetime.datetime.now() + datetime.timedelta(days=1))
-    #     return Response()
+    @action(detail=False, methods=['post'])
+    def test(self, request, pk=None):
+        from dateutil.relativedelta import relativedelta
+        # print(datetime.datetime.now() + relativedelta(months=3))
+        return Response()
 
 
 class GoalViewSet(viewsets.GenericViewSet,
-                  mixins.ListModelMixin):
+                  mixins.ListModelMixin,
+                  mixins.UpdateModelMixin):
     queryset = Goal.objects.all()
     serializer_class = GoalListSerializer
     pagination_class = None
@@ -107,6 +115,19 @@ class GoalViewSet(viewsets.GenericViewSet,
             'evening': evening_serializer.data
         }
         return Response(data)
+
+    def update(self, request, *args, **kwargs):
+        goal = self.get_object()
+        context = {
+            'user': request.user,
+            'observer': request.data.pop('observer') if request.data.get('observer') else None,
+            'request': request
+        }
+        serializer = GoalAddSerializer(instance=goal, data=request.data, context=context)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def calendar(self, request, pk=None):
@@ -205,6 +226,31 @@ class GoalViewSet(viewsets.GenericViewSet,
             }
         }
         return Response(data)
+
+
+class CommentViewSet(viewsets.GenericViewSet,
+                     mixins.ListModelMixin,
+                     mixins.CreateModelMixin):
+    queryset = Comment.objects.all()
+    pagination_class = None
+
+    def filter_queryset(self, queryset):
+        if self.action == 'list':
+            return queryset.filter(goal_id=self.request.query_params.get('goal'))
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CommentCreateSerializer
+        elif self.action == 'list':
+            try:
+                goal = Goal.objects.get(id=self.request.query_params.get('goal'))
+                goal.is_new_comment = False
+                goal.save()
+            except:
+                pass
+            return CommentListSerializer
+        return CommentListSerializer
 
 
 class VisualizationViewSet(viewsets.GenericViewSet,

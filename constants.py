@@ -31,6 +31,9 @@ ACTIVATION_EMAIL_SUBJECT_EN = '24Goals Authorization'
 ACTIVATION_EMAIL_BODY_START_EN = '''Hi!
 
 I am Yerkezhan and I am the founder of 24Goals. Thank you for downloading my mobile app! I have created an account for you and it is almost ready. I just need you to verify your details by activating your account using the link below.'''
+ACTIVATION_EMAIL_BODY_START_EN_V2 = '''Hi!
+
+I am Yerkezhan and I am the founder of 24Goals. Thank you for downloading my mobile app! I have created an account for you and it is almost ready. I just need you to verify your details by activating your account using the code below.'''
 ACTIVATION_EMAIL_BODY_END_EN = '''Follow us on Instagram: 24goalsapp
 
 You can contact us at any time and leave a request. We value our clients and will not disregard your request.'''
@@ -40,6 +43,10 @@ ACTIVATION_EMAIL_BODY_START_RU = '''Привет!
 
 Я Еркежан и я основатель 24Goals. Благодарю Вас за загрузку моего мобильного приложения!
 Я создала для Вас аккаунт и он почти готов. Мне просто нужно, чтобы Вы подтвердили свои данные, активировав свою учетную запись, используя ссылку ниже. '''
+ACTIVATION_EMAIL_BODY_START_RU_V2 = '''Привет!
+
+Я Еркежан и я основатель 24Goals. Благодарю Вас за загрузку моего мобильного приложения!
+Я создала для Вас аккаунт и он почти готов. Мне просто нужно, чтобы Вы подтвердили свои данные, активировав свою учетную запись, используя код ниже. '''
 ACTIVATION_EMAIL_BODY_END_RU = '''Будь подписан на нас в Инстаграм - 24goalsapp 
 Вы в любое время можете обратиться к нам. Мы ценим наших клиентов и не оставим без внимания Ваш запрос.'''
 
@@ -129,6 +136,9 @@ BEFORE_END_BODY_EN = 'Are you ready?'
 END_TITLE_EN = 'The 30-day period is coming to an end today!'
 END_BODY_EN = 'Click here and summarize.'
 
+NEW_COMMENT_RU = 'Новый коментарий'
+NEW_COMMENT_EN = 'New comment'
+
 FIREBASE_SERVER_KEY = os.environ.get('FIREBASE_SERVER_KEY')
 
 FIREBASE_DEEPLINKS_PREFIX = 'https://app.goalsterapp.com/'
@@ -161,3 +171,6 @@ FIREBASE_TOPIC_INVITE = 'allUsers'
 
 TOPIC_INVITE_TEXT_EN = 'Invite a friend or become an observer'
 TOPIC_INVITE_TEXT_RU = 'Пригласи друга или стань наблюдателем'
+
+FEED_TYPE_FOLLOWING = 'following'
+FEED_TYPE_RECOMMENDATIONS = 'recommendations'

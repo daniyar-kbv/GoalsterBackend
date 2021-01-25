@@ -1,15 +1,17 @@
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.shortcuts import redirect
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_jwt.settings import api_settings
-from users.models import MainUser, Transaction
+from users.models import MainUser, Transaction, OTP, Reaction, Profile
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
-    ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer, UserVerifyActivationEmailSerializer
+    ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer, UserVerifyActivationEmailSerializer, \
+    RegisterSerializer, VerifyOTPSerializer, ResendOTPSerializer, FeedSerializer, ReactSerializer, \
+    ProfileFullSerializer, ProfileSerializer
 from main.tasks import after_three_days, send_email
 from main.models import SelectedSphere, Observation, UserResults
 from main.serializers import UserResultsSerializer
@@ -24,6 +26,11 @@ class UserViewSet(viewsets.GenericViewSet,
                   mixins.CreateModelMixin,
                   mixins.ListModelMixin):
     queryset = MainUser.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return RegisterSerializer
+        return UserShortSerializer
 
     @action(detail=False, methods=['post'], name='send_activation_email')
     def send_activation_email(self, request, pk=None):
@@ -53,6 +60,36 @@ class UserViewSet(viewsets.GenericViewSet,
             user = MainUser.objects.create_user(email=email)
             user.save()
         return Response(auth.auth_user_data(user, request))
+
+    @action(detail=False, methods=['post'], name='verify-otp')
+    def verify_otp(self, request, pk=None):
+        serializer = VerifyOTPSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                user = MainUser.objects.get(email=serializer.validated_data.get('email'))
+            except:
+                return Response(response.make_messages([_("User with such email doesn't exist")]),
+                                status.HTTP_400_BAD_REQUEST)
+            try:
+                otp = OTP.objects.get(user=user, code=serializer.validated_data.get('otp'))
+            except:
+                return Response(response.make_messages([_('The code is invalid')]), status.HTTP_400_BAD_REQUEST)
+            otp.delete()
+            return Response(auth.auth_user_data(user, request))
+        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'], name='login_resend_otp')
+    def login_resend_otp(self, request, pk=None):
+        serializer = ResendOTPSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                user = MainUser.objects.get(email=serializer.validated_data.get('email'))
+            except:
+                return Response(response.make_messages([_("User with such email doesn't exist")]),
+                                status.HTTP_400_BAD_REQUEST)
+            OTP.generate(user, request.headers.get('Accept-Language'))
+            return Response(serializer.data)
+        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'])
     def temp_auth(self, request, pk=None):
@@ -91,6 +128,16 @@ class UserViewSet(viewsets.GenericViewSet,
         return Response(auth.auth_user_data(user, request))
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def connect_v2(self, request, pk=None):
+        user = request.user
+        user.last_activity = timezone.now()
+        user.save()
+        serializer = ConnectSerializer(instance=user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(auth.auth_user_data(user, request))
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def change_language(self, request, pk=None):
         serializer = ChangeLanguageSerializer(data=request.data)
         if serializer.is_valid():
@@ -117,8 +164,11 @@ class UserViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def results(self, request, pk=None):
-        results = UserResults.objects.filter(user=request.user)
+        user = request.user
+        results = UserResults.objects.filter(user=user)
         serializer = UserResultsSerializer(results, many=True)
+        user.show_results = False
+        user.save()
         return Response({
             'results': serializer.data
         })
@@ -143,3 +193,66 @@ class UserViewSet(viewsets.GenericViewSet,
                              files)
             return Response()
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['put'], permission_classes=[permissions.IsAuthenticated])
+    def update_profile(self, request, pk=None):
+        if Profile.objects.filter(user=request.user).exists():
+            serializer = ProfileSerializer(instance=request.user.profile, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        else:
+            serializer = ProfileSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=request.user)
+        return serializer.data
+
+
+class FeedViewSet(viewsets.GenericViewSet,
+                  mixins.ListModelMixin,
+                  mixins.RetrieveModelMixin):
+    queryset = MainUser.objects.filter(is_superuser=False, profile__isnull=False)
+
+    def filter_queryset(self, queryset):
+        if self.action == 'list':
+            type = self.request.query_params.get('type', constants.FEED_TYPE_RECOMMENDATIONS)
+            queryset = queryset.annotate(
+                selected_count=Count('selected')
+            ).filter(
+                ~Q(id=self.request.user.id) &
+                Q(selected_count__gt=0)
+            )
+            if type == constants.FEED_TYPE_RECOMMENDATIONS:
+                queryset = queryset.filter(~Q(followers=self.request.user))
+            elif type == constants.FEED_TYPE_FOLLOWING:
+                queryset = queryset.filter(followers=self.request.user)
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return ProfileFullSerializer
+        return FeedSerializer
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def follow(self, request, pk=None):
+        instance = self.get_object()
+        user = request.user
+        instance.followers.remove(user) \
+        if instance.followers.filter(id=user.id).exists() else \
+        instance.followers.add(user)
+        return Response()
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def react(self, request, pk=None):
+        serializer = ReactSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = self.get_object()
+        try:
+            reaction = Reaction.objects.get(type=serializer.reaction_type, user=user, sender=request.user)
+            reaction.delete()
+        except:
+            Reaction.objects.create(type=serializer.reaction_type, user=user, sender=request.user)
+        return Response({
+            'id': serializer.reaction_type.id,
+            'emoji': serializer.reaction_type.emoji,
+            'count': Reaction.objects.filter(user=user, type=serializer.reaction_type).count()
+        })

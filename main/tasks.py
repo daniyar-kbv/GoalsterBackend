@@ -4,7 +4,7 @@ from django.core.management import call_command
 from django.core.mail import EmailMessage
 from django.utils import timezone
 from django.conf import settings
-from users.models import MainUser, Transaction
+from users.models import MainUser, Transaction, OTP
 from main.models import SelectedSphere, UserAnswer, UserResults, Goal
 from utils.notifications import send_notification, get_topic_text
 from dateutil.relativedelta import relativedelta
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def send_email(subject, body, to, attachments=None, count=0):
+def send_email(subject, body, to, attachments=None, html=False, count=0):
     logger.info(f'Task: Email sending to {to} started')
     if count == 10:
         return False
@@ -29,12 +29,14 @@ def send_email(subject, body, to, attachments=None, count=0):
         if attachments:
             for attachment in attachments:
                 email.attach_file(attachment)
+        if html:
+            email.content_subtype = 'html'
         email.send()
         logger.info(f'Task: Email sending to {to} finished')
         return True
     except Exception as e:
         logger.info(f'Task: Email sending to {to} failed {print(e) if count == 0 else ""}')
-        return send_email(subject, body, to, attachments, count=count+1)
+        return send_email(subject, body, to, attachments, html, count=count+1)
 
 
 @shared_task
@@ -52,6 +54,7 @@ def check_reset_spheres():
                                                number=Goal.objects.filter(user=user, sphere=sphere, is_done=True).count())
                 spheres.delete()
                 send_notification(user, constants.NOTIFICATION_END)
+                user.show_results = True
             elif sphere.expires_at.date() == datetime.date.today() - datetime.timedelta(days=3):
                 send_notification(user, constants.NOTIFICATION_BEFORE_END)
 
@@ -135,3 +138,11 @@ def send_invite_notification():
                 requests.request(method='POST', url=constants.FCM_SEND_URL, json=parameters, headers=headers)
                 count += 1
                 users = MainUser.objects.filter(language=language[0])[count * 100:100 * (count + 1)]
+
+@shared_task
+def delete_otp(id):
+    try:
+        otp = OTP.objects.get(id=id)
+    except:
+        return
+    otp.delete()

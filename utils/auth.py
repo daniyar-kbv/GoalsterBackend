@@ -3,12 +3,13 @@ from django.db.models import Q
 from rest_framework_jwt.settings import api_settings
 from rest_framework.response import Response
 from rest_framework import status
+from dateutil.relativedelta import relativedelta
 from main.models import SelectedSphere, Observation
 from main.tasks import send_email
-from users.models import Transaction, MainUser
-from users.serializers import UserSendActivationEmailSerializer
+from users.models import Transaction, MainUser, Profile
+from users.serializers import UserSendActivationEmailSerializer, ProfileSerializer
 from utils import general, response, emails
-import constants
+import constants, datetime
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -20,10 +21,18 @@ def auth_user_data(user, request):
     spheres = []
     last_transaction = Transaction.objects.filter(user=user).first()
     premium_type = None
+    premium_end_date = None
     if last_transaction:
         premium_type = f'{last_transaction.time_amount} ' \
                        f'{general.get_type_name(constants.TIME_FRAMES, last_transaction.time_unit)}' \
                        f'{_("s") if last_transaction.time_amount > 1 else ""}'
+        premium_end_date = (
+            last_transaction.created_at + (
+            relativedelta(months=last_transaction.time_amount)
+            if last_transaction.time_unit == constants.MONTH else
+            relativedelta(years=last_transaction.time_amount)
+            )
+        ).strftime(constants.DATE_FORMAT)
     for sphere in SelectedSphere.objects.filter(user=user):
         spheres.append({
             'id': sphere.id,
@@ -35,10 +44,13 @@ def auth_user_data(user, request):
         'hasSpheres': SelectedSphere.objects.filter(user=user).count() == 3,
         'spheres': spheres,
         'email': user.email,
+        'profile': ProfileSerializer(user.profile).data if Profile.objects.filter(user=user).exists() else None,
         'isPremium': user.is_premium,
         'premiumType': premium_type,
+        'premiumEndDate': premium_end_date,
         'notConfirmedCount': Observation.objects.filter(Q(observer=user) & Q(is_confirmed=None)).distinct(
-            'observer').count()
+            'observer').count(),
+        'showResults': user.show_results
     }
 
 

@@ -1,7 +1,8 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from main.models import SelectedSphere, Goal, Observation, UserAnswer, Visualization, Help, UserResults
+from main.models import SelectedSphere, Goal, Observation, UserAnswer, Visualization, Help, UserResults, Comment
 from users.models import MainUser
+from users.serializers import UserShortSerializer
 from utils import response
 import constants
 
@@ -15,6 +16,19 @@ class SelectedSphereSerializer(serializers.ModelSerializer):
 
     def get_name(self, obj):
         return obj.sphere
+
+
+class SelectedSpheresFullSerializer(SelectedSphereSerializer):
+    count = serializers.SerializerMethodField()
+
+    class Meta(SelectedSphereSerializer.Meta):
+        fields = SelectedSphereSerializer.Meta.fields + ['count']
+
+    def get_count(self, obj):
+        return Goal.objects.filter(
+            sphere=obj,
+            is_done=True
+        ).count()
 
 
 class ChooseSpheresInnerSerializer(serializers.Serializer):
@@ -64,7 +78,7 @@ class GoalListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'time', 'is_done', 'observer', 'is_confirmed','sphere')
+        fields = ('id', 'name', 'time', 'is_done', 'observer', 'is_confirmed', 'sphere')
 
     def get_observer(self, obj):
         try:
@@ -88,7 +102,6 @@ class GoalListSerializer(serializers.ModelSerializer):
 
 
 class GoalAddSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Goal
         fields = '__all__'
@@ -117,6 +130,38 @@ class GoalAddSerializer(serializers.ModelSerializer):
             observation._created = True
             observation.save()
         return goal
+
+    def update(self, instance, validated_data):
+        instance.time = validated_data.get('time', instance.time)
+        instance.sphere = validated_data.get('sphere', instance.sphere)
+        instance.name = validated_data.get('name', instance.name)
+        instance.is_shared = validated_data.get('is_shared', instance.is_shared)
+        instance.is_public = validated_data.get('is_public', instance.is_public)
+        if validated_data.get('is_shared'):
+            user = self.context.get('user')
+            if not user.is_premium:
+                raise serializers.ValidationError(
+                    response.make_messages([_('You have to be premium to add observers')]))
+            observer_id = self.context.get('observer')
+            try:
+                Observation.objects.get(id=observer_id)
+            except:
+                try:
+                    observer = MainUser.objects.get(id=observer_id)
+                except:
+                    raise serializers.ValidationError(
+                        response.make_messages([f'{_("Observer")} {_("Does not exist")}']))
+                observations = Observation.objects.filter(goal=instance)
+                observations.delete()
+                observation = Observation.objects.create(observer=observer, goal=instance)
+                observation._request = self.context.get('request')
+                observation._created = True
+                observation.save()
+        else:
+            observations = Observation.objects.filter(goal=instance)
+            observations.delete()
+        instance.save()
+        return instance
 
 
 class UserAnswerListSerializer(serializers.ModelSerializer):
@@ -237,3 +282,34 @@ class UserResultsSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserResults
         fields = ['sphere_name', 'number']
+
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['goal', 'text']
+
+    def create(self, validated_data):
+        goal = validated_data.get('goal')
+        if self.context.get('request').user != goal.user and \
+            not Observation.objects.filter(
+                goal=goal,
+                observer=self.context.get('request').user,
+                is_confirmed=True
+            ).exists():
+            raise serializers.ValidationError(response.make_messages([_('You are not observer of this user')]))
+        comment = Comment.objects.create(
+            **validated_data,
+            sender=self.context.get('request').user,
+            is_owner=self.context.get('request').user == goal.user
+        )
+        return comment
+
+
+class CommentListSerializer(serializers.ModelSerializer):
+    sender = UserShortSerializer()
+    created_at = serializers.DateTimeField(format=constants.DATETIME_FORMAT)
+
+    class Meta:
+        model = Comment
+        exclude = ['goal']

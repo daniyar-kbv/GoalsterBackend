@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-import constants
+from utils import validators, upload, emails
+import constants, random
 
 
 class MainUserManager(BaseUserManager):
@@ -47,10 +48,17 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
         default=False,
         blank=True
     )
+    followers = models.ManyToManyField(
+        'self',
+        related_name='following',
+        verbose_name=_('Followers'),
+        blank=True
+    )
 
     is_premium = models.BooleanField(_('Premium'), default=False, blank=True)
     is_staff = models.BooleanField(_('Is admin'), default=False)
     is_active = models.BooleanField(_('Is active'), default=True)
+    show_results = models.BooleanField(_('Show results'), default=False)
 
     objects = MainUserManager()
 
@@ -65,6 +73,65 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'{self.id}: {self.email}'
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(
+        MainUser,
+        on_delete=models.CASCADE,
+        related_name='profile',
+        verbose_name=_('User')
+    )
+    name = models.CharField(_('First name'), max_length=100)
+    specialization = models.CharField(_('Specialization'), max_length=100)
+    instagram_username = models.CharField(_('Instagram username'), max_length=100)
+    avatar = models.FileField(
+        _('Image'),
+        upload_to=upload.avatar_document_path,
+        validators=[validators.validate_file_size, validators.basic_validate_images]
+    )
+
+    class Meta:
+        verbose_name = _('Profile')
+        verbose_name_plural = _('Profiles')
+
+    def __str__(self):
+        return f'{self.id} {self.user}'
+
+
+class OTP(models.Model):
+    user = models.ForeignKey(
+        MainUser,
+        on_delete=models.CASCADE,
+        related_name='otps',
+        verbose_name=_('User')
+    )
+    created_at = models.DateTimeField(_('Creation date'), auto_now_add=True, null=False, blank=True)
+    code = models.CharField(_('Code'), max_length=4)
+
+    def __str__(self):
+        return f'{self.id} {self.user} {self.code}'
+
+    @staticmethod
+    def generate(user, language):
+        from main.tasks import send_email
+        code = ''.join([str(random.randint(0, 9)) for _ in range(4)])
+        while OTP.objects.filter(code=code).exists():
+            code = ''.join([str(random.randint(0, 9)) for _ in range(4)])
+        otp = OTP.objects.create(user=user, code=code)
+        if language == 'ru-ru':
+            subject = constants.ACTIVATION_EMAIL_SUBJECT_RU
+        else:
+            subject = constants.ACTIVATION_EMAIL_SUBJECT_EN
+        send_email.delay(
+            subject,
+            emails.generate_activation_email_v2(
+                language,
+                otp.code
+            ),
+            otp.user.email,
+            html=True
+        )
 
 
 class Transaction(models.Model):
@@ -84,5 +151,50 @@ class Transaction(models.Model):
         verbose_name_plural = _('Transactions')
         ordering = ['-created_at']
 
+    @property
+    def end_date(self):
+        pass
+
+
     def __str__(self):
         return f'{self.id}: {self.user} {self.product_id}'
+
+
+class ReactionType(models.Model):
+    emoji = models.CharField(_('Emoji'), max_length=100)
+
+    class Meta:
+        verbose_name = _('Reaction type')
+        verbose_name_plural = _('Reaction types')
+
+    def __str__(self):
+        return f'{self.id} {self.emoji}'
+
+
+class Reaction(models.Model):
+    user = models.ForeignKey(
+        MainUser,
+        on_delete=models.CASCADE,
+        verbose_name=_('User'),
+        related_name='my_reactions'
+    )
+    sender = models.ForeignKey(
+        MainUser,
+        on_delete=models.CASCADE,
+        verbose_name=_('Sender'),
+        related_name='sent_reactions'
+    )
+    type = models.ForeignKey(
+        ReactionType,
+        on_delete=models.PROTECT,
+        verbose_name=_('Type'),
+        related_name='reactions'
+    )
+
+    class Meta:
+        verbose_name = _('Reaction')
+        verbose_name_plural = _('Reactions')
+
+    def __str__(self):
+        return f'{self.id} {self.user} {self.type}'
+

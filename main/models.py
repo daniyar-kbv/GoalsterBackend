@@ -31,7 +31,9 @@ class Goal(models.Model):
                                             choices=constants.TIME_TYPES,
                                             default=constants.TIME_MORNING)
     is_done = models.BooleanField(_('Is done'), default=False, blank=True)
+    is_public = models.BooleanField(_('Is public'), default=False, blank=True)
     is_shared = models.BooleanField(_('Is shared'), default=False, blank=True)
+    is_new_comment = models.BooleanField(_('Is new comment'), default=False, blank=True)
     created_at = models.DateTimeField(_('Creation date'), auto_now_add=True, blank=True)
     sphere = models.ForeignKey(SelectedSphere,
                                on_delete=models.CASCADE,
@@ -72,6 +74,33 @@ class Observation(models.Model):
 
     def __str__(self):
         return f'{self.id}: {self.goal}'
+
+
+class Comment(models.Model):
+    created_at = models.DateTimeField(_('Creation date'), auto_now_add=True, blank=True)
+    sender = models.ForeignKey(
+        MainUser,
+        on_delete=models.CASCADE,
+        verbose_name=_('Sender'),
+        related_name='sender',
+        null=True
+    )
+    goal = models.ForeignKey(
+        Goal,
+        on_delete=models.CASCADE,
+        verbose_name=_('Goal'),
+        related_name='messages'
+    )
+    text = models.TextField()
+    is_owner = models.BooleanField(_('Owner'), null=True)
+
+    class Meta:
+        verbose_name = _('Comment')
+        verbose_name_plural = _('Comments')
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f'{self.id} {self.sender}'
 
 
 class Visualization(models.Model):

@@ -22,6 +22,23 @@ def send_notification(user, type):
     requests.request(method='POST', url=constants.FCM_SEND_URL, json=parameters, headers=headers)
 
 
+def send_user_notification(user, title, body, data):
+    parameters = {
+        'notification': {
+            'title': title,
+            'body': body,
+            'sound': 'default',
+            'badge': 1
+        },
+        'data': data,
+        'to': user.fcm_token
+    }
+    headers = {
+        'Authorization': f'key={constants.FIREBASE_SERVER_KEY}'
+    }
+    requests.request(method='POST', url=constants.FCM_SEND_URL, json=parameters, headers=headers)
+
+
 def get_texts(type, language):
     if type == constants.NOTIFICATION_3DAYS:
         if language == constants.LANGUAGE_RUSSIAN:

@@ -1,7 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from users.models import MainUser, Transaction
+from main.models import SelectedSphere, Goal
+from users.models import MainUser, Transaction, Profile, OTP, ReactionType, Reaction
 from utils import response
+import constants
 
 
 class UserSendActivationEmailSerializer(serializers.Serializer):
@@ -50,3 +52,149 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = '__all__'
         read_only_fields = ['user']
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+        read_only_fields = ['user']
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = MainUser
+        fields = ['email', 'profile']
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop('profile')
+        user = MainUser.objects.create(**validated_data)
+        Profile.objects.create(**profile_data, user=user)
+        OTP.generate(user, self.context.get('request').headers.get('Accept-Language'))
+        return user
+
+
+class VerifyOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField()
+
+
+class ResendOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class ProfileFeedSerialzier(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        exclude = ['user']
+
+
+class SelectedSpheresFullSerializer(serializers.ModelSerializer):
+    count = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SelectedSphere
+        fields = ['id', 'name', 'description', 'count']
+
+    def get_name(self, obj):
+        return obj.sphere
+
+    def get_count(self, obj):
+        return Goal.objects.filter(
+            sphere=obj,
+            is_done=True
+        ).count()
+
+
+class FeedSerializer(serializers.ModelSerializer):
+    profile = ProfileFeedSerialzier()
+    selected = SelectedSpheresFullSerializer(many=True)
+    reactions = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MainUser
+        fields = ['id', 'profile', 'selected', 'reactions']
+
+    def get_reactions(self, obj):
+        return map(
+            lambda type:
+            {
+                'id': type.id,
+                'emoji': type.emoji,
+                'count': Reaction.objects.filter(user=obj, type=type).count()
+            },
+            ReactionType.objects.all()
+        )
+
+
+class ProfileGoalsSerializer(serializers.ModelSerializer):
+    sphere = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Goal
+        fields = ('id', 'name', 'time', 'is_done', 'sphere')
+
+    def get_sphere(self, obj):
+        for index, sphere in enumerate(SelectedSphere.objects.filter(user=self.context.get('user'))):
+            if sphere == obj.sphere:
+                return index + 1
+        return None
+
+
+class ProfileFullSerializer(FeedSerializer):
+    goals = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
+
+    class Meta(FeedSerializer.Meta):
+        fields = FeedSerializer.Meta.fields + ['goals', 'is_following']
+
+    def get_goals(self, obj):
+        queryset = Goal.objects.filter(is_public=True)
+        morning_serializer = ProfileGoalsSerializer(
+            queryset.filter(time=constants.TIME_MORNING).order_by('created_at'),
+            many=True,
+            context={
+                'user': obj
+            }
+        )
+        day_serializer = ProfileGoalsSerializer(
+            queryset.filter(time=constants.TIME_DAY).order_by('created_at'),
+            many=True,
+            context={
+                'user': obj
+            }
+        )
+        evening_serializer = ProfileGoalsSerializer(
+            queryset.filter(time=constants.TIME_EVENING).order_by('created_at'),
+            many=True,
+            context={
+                'user': obj
+            }
+        )
+        data = {
+            'goals': len(morning_serializer.data) != 0 or len(day_serializer.data) != 0 or len(
+                evening_serializer.data) != 0,
+            'morning': morning_serializer.data,
+            'day': day_serializer.data,
+            'evening': evening_serializer.data
+        }
+        return data
+
+    def get_is_following(self, obj):
+        return obj.followers.filter(id=self.context.get('request').user.id).exists()
+
+
+class ReactSerializer(serializers.Serializer):
+    reaction = serializers.IntegerField()
+
+    def validate_reaction(self, value):
+        if not ReactionType.objects.filter(id=value).exists():
+            raise serializers.ValidationError(_('Does not exist'))
+        return value
+
+    @property
+    def reaction_type(self):
+        return ReactionType.objects.get(id=self.data.get('reaction'))

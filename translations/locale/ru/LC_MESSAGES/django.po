@@ -20,6 +20,66 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
+msgid "Is new comment"
+msgstr "Новый комментарий"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Reaction type"
+msgstr "Вид реакции"
+
+msgid "Reaction types"
+msgstr "Виды реакциий"
+
+msgid "Reaction"
+msgstr "Реакция"
+
+msgid "Reactions"
+msgstr "Реакции"
+
+msgid "Followers"
+msgstr "Подписчики"
+
+msgid "Show results"
+msgstr "Показать результаты"
+
+msgid "Owner"
+msgstr "Владелец"
+
+msgid "Sender"
+msgstr "Отправитель"
+
+msgid "Comment"
+msgstr "Комментарий"
+
+msgid "Comments"
+msgstr "Комментарии"
+
+msgid "Is public"
+msgstr "Публичная"
+
+msgid "User with such email doesn't exist"
+msgstr "Пользователь с таким email не существует"
+
+msgid "Profile"
+msgstr "Профиль"
+
+msgid "Profiles"
+msgstr "Профили"
+
+msgid "Code"
+msgstr "Код"
+
+msgid "Instagram username"
+msgstr "Имя пользователя инстаграм"
+
+msgid "Specialization"
+msgstr "Специализация"
+
+msgid "First name"
+msgstr "Имя"
+
 msgid "Sent"
 msgstr "Оправлено"
 
