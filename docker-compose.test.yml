@@ -17,8 +17,6 @@ services:
   celery:
     build: .
     command: celery -A goalster worker --pool=solo -l info
-    volumes:
-    - .:/goalster
     depends_on:
     - db
     - rabbit
@@ -27,8 +25,6 @@ services:
   celery1:
     build: .
     command: celery -A goalster worker --pool=solo -l info
-    volumes:
-    - .:/goalster
     depends_on:
     - db
     - rabbit
@@ -37,8 +33,6 @@ services:
   celery_beat:
     build: .
     command: celery -A goalster beat -l info
-    volumes:
-    - .:/goalster
     depends_on:
     - db
     - rabbit
