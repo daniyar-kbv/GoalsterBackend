@@ -66,7 +66,8 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         user_data = validated_data.get('user')
         if user_data:
             user = instance.user
-            user.email = user_data.get('email', user.email)
+            email = user_data.get('email', user.email)
+            user.email = email if user.email != email else user.email
             user.save()
         instance.name = validated_data.get('name', instance.name)
         instance.specialization = validated_data.get('specialization', instance.specialization)
