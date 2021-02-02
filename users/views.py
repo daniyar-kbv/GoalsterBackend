@@ -197,19 +197,24 @@ class UserViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['put'], permission_classes=[permissions.IsAuthenticated])
     def update_profile(self, request, pk=None):
+        email = request.data.get('email')
+        context = {
+            'email': email
+        }
         if Profile.objects.filter(user=request.user).exists():
-            serializer = UpdateProfileSerializer(instance=request.user.profile, data=request.data)
+            serializer = UpdateProfileSerializer(instance=request.user.profile, data=request.data, context=context)
             serializer.is_valid(raise_exception=True)
             serializer.save()
         else:
-            serializer = UpdateProfileSerializer(data=request.data)
+            serializer = UpdateProfileSerializer(data=request.data, context=context)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
         payload = jwt_payload_handler(request.user)
         token = jwt_encode_handler(payload)
         return Response({
-            "token": token,
-            "profile": serializer.data
+            'token': token,
+            'profile': serializer.data,
+            'email': email
         })
 
 

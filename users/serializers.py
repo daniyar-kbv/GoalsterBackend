@@ -56,20 +56,16 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
-    user = UserShortSerializer()
-
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ['name', 'specialization', 'instagram_username', 'avatar']
 
     def update(self, instance, validated_data):
-        user_data = validated_data.get('user')
-        if user_data:
-            user = instance.user
-            email = user_data.get('email', user.email)
-            if email != user.email:
-                user.email = email
-                user.save()
+        email = self.context.get('email')
+        user = instance.user
+        if email != user.email:
+            user.email = email
+            user.save()
         instance.name = validated_data.get('name', instance.name)
         instance.specialization = validated_data.get('specialization', instance.specialization)
         instance.instagram_username = validated_data.get('instagram_username', instance.instagram_username)
