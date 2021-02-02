@@ -11,7 +11,7 @@ from users.models import MainUser, Transaction, OTP, Reaction, Profile
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
     ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer, UserVerifyActivationEmailSerializer, \
     RegisterSerializer, VerifyOTPSerializer, ResendOTPSerializer, FeedSerializer, ReactSerializer, \
-    ProfileFullSerializer, ProfileSerializer
+    ProfileFullSerializer, ProfileSerializer, UpdateProfileSerializer
 from main.tasks import after_three_days, send_email
 from main.models import SelectedSphere, Observation, UserResults
 from main.serializers import UserResultsSerializer
@@ -198,14 +198,19 @@ class UserViewSet(viewsets.GenericViewSet,
     @action(detail=False, methods=['put'], permission_classes=[permissions.IsAuthenticated])
     def update_profile(self, request, pk=None):
         if Profile.objects.filter(user=request.user).exists():
-            serializer = ProfileSerializer(instance=request.user.profile, data=request.data)
+            serializer = UpdateProfileSerializer(instance=request.user.profile, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
         else:
-            serializer = ProfileSerializer(data=request.data)
+            serializer = UpdateProfileSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
-        return serializer.data
+        payload = jwt_payload_handler(request.user)
+        token = jwt_encode_handler(payload)
+        return Response({
+            "token": token,
+            "profile": serializer.data
+        })
 
 
 class FeedViewSet(viewsets.GenericViewSet,

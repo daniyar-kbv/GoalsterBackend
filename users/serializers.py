@@ -21,6 +21,7 @@ class UserShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = MainUser
         fields = ('id', 'email')
+        read_only_fields = ['id']
 
 
 class ChangeLanguageSerializer(serializers.Serializer):
@@ -52,6 +53,27 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = '__all__'
         read_only_fields = ['user']
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    user = UserShortSerializer()
+
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.get('user')
+        if user_data:
+            user = instance.user
+            user.email = user_data.get('email', user.email)
+            user.save()
+        instance.name = validated_data.get('name', instance.name)
+        instance.specialization = validated_data.get('specialization', instance.specialization)
+        instance.instagram_username = validated_data.get('instagram_username', instance.instagram_username)
+        instance.avatar = validated_data.get('avatar', instance.avatar)
+        instance.save()
+        return instance
 
 
 class ProfileSerializer(serializers.ModelSerializer):

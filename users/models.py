@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from PIL import Image, ExifTags
 from utils import validators, upload, emails
 import constants, random
 
@@ -98,6 +99,29 @@ class Profile(models.Model):
     def __str__(self):
         return f'{self.id} {self.user}'
 
+    def save(self, *args, **kwargs):
+        upload.delete_folder(self.avatar)
+
+        super(Profile, self).save(*args, **kwargs)
+
+        image = Image.open(self.avatar.path)
+
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation':
+                break
+
+        if image._getexif():
+            exif = dict(image._getexif().items())
+
+            if exif.get(orientation) == 3:
+                image = image.rotate(180, expand=True)
+            elif exif.get(orientation) == 6:
+                image = image.rotate(270, expand=True)
+            elif exif.get(orientation) == 8:
+                image = image.rotate(90, expand=True)
+
+        image.save(self.avatar.path, quality=100, optimize=True)
+
 
 class OTP(models.Model):
     user = models.ForeignKey(
@@ -150,11 +174,6 @@ class Transaction(models.Model):
         verbose_name = _('Transaction')
         verbose_name_plural = _('Transactions')
         ordering = ['-created_at']
-
-    @property
-    def end_date(self):
-        pass
-
 
     def __str__(self):
         return f'{self.id}: {self.user} {self.product_id}'
