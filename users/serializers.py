@@ -67,8 +67,9 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         if user_data:
             user = instance.user
             email = user_data.get('email', user.email)
-            user.email = email if user.email != email else user.email
-            user.save()
+            if email != user.email:
+                user.email = email
+                user.save()
         instance.name = validated_data.get('name', instance.name)
         instance.specialization = validated_data.get('specialization', instance.specialization)
         instance.instagram_username = validated_data.get('instagram_username', instance.instagram_username)
