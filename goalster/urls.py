@@ -26,7 +26,8 @@ urlpatterns = i18n_patterns(
     url(r'^api/main/', include('main.urls')),
     prefix_default_language=False
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + \
-    static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + \
+    static(settings.DOCUMENTS_URL, document_root=settings.DOCUMENTS_ROOT)
 
 admin.site.index_title = ''
 admin.site.site_header = _('24Goals admin panel')
