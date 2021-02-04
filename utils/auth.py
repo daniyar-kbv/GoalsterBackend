@@ -39,12 +39,19 @@ def auth_user_data(user, request):
             'sphere': sphere.sphere,
             'description': sphere.description
         })
+    profile_data = ProfileSerializer(
+        user.profile,
+        context={
+            'request': request
+        }).data \
+        if Profile.objects.filter(user=user).exists() \
+        else None
     return {
         'token': token,
         'hasSpheres': SelectedSphere.objects.filter(user=user).count() == 3,
         'spheres': spheres,
         'email': user.email,
-        'profile': ProfileSerializer(user.profile).data if Profile.objects.filter(user=user).exists() else None,
+        'profile': profile_data,
         'isPremium': user.is_premium,
         'premiumType': premium_type,
         'premiumEndDate': premium_end_date,
