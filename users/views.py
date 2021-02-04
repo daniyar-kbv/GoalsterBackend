@@ -109,7 +109,7 @@ class UserViewSet(viewsets.GenericViewSet,
         serializer = ResendOTPSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                user = MainUser.objects.get(email=serializer.validated_data.get('email'), is_active=True)
+                user = MainUser.objects.get(email=serializer.validated_data.get('email'))
             except:
                 return Response(response.make_messages([_("User with such email doesn't exist")]),
                                 status.HTTP_400_BAD_REQUEST)
