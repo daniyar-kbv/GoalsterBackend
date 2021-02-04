@@ -148,16 +148,15 @@ class OTP(models.Model):
             subject = constants.ACTIVATION_EMAIL_SUBJECT_RU
         else:
             subject = constants.ACTIVATION_EMAIL_SUBJECT_EN
-        print(otp.code)
-        # send_email.delay(
-        #     subject,
-        #     emails.generate_activation_email_v2(
-        #         language,
-        #         otp.code
-        #     ),
-        #     otp.user.email,
-        #     html=True
-        # )
+        send_email.delay(
+            subject,
+            emails.generate_activation_email_v2(
+                language,
+                otp.code
+            ),
+            otp.user.email,
+            html=True
+        )
 
     @staticmethod
     def delete_for_user(user):
