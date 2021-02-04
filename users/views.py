@@ -24,13 +24,10 @@ jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
 class UserViewSet(viewsets.GenericViewSet,
-                  mixins.CreateModelMixin,
                   mixins.ListModelMixin):
     queryset = MainUser.objects.all()
 
     def get_serializer_class(self):
-        if self.action == 'create':
-            return RegisterSerializer
         return UserShortSerializer
 
     @action(detail=False, methods=['post'], name='send_activation_email')
@@ -62,6 +59,31 @@ class UserViewSet(viewsets.GenericViewSet,
             user.save()
         return Response(auth.auth_user_data(user, request))
 
+    @action(detail=False, methods=['post'], name='register')
+    def register(self, request, pk=None):
+        email = request.data.get('email')
+        if email:
+            context = {
+                'request': request
+            }
+            try:
+                user = MainUser.objects.get(email=email)
+                if user.is_active:
+                    return Response(response.make_messages([_("This email is already registered")]),
+                                    status.HTTP_400_BAD_REQUEST)
+                serializer = RegisterSerializer(instance=user, data=request.data, context=context)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
+            except:
+                serializer = RegisterSerializer(data=request.data, context=context)
+                serializer.is_valid(raise_exception=True)
+                user = serializer.save()
+                user.is_active = False
+                user.save()
+                return Response(serializer.data)
+        return Response(response.make_messages([_("Enter a valid email address.")]), status.HTTP_400_BAD_REQUEST)
+
     @action(detail=False, methods=['post'], name='verify-otp')
     def verify_otp(self, request, pk=None):
         serializer = VerifyOTPSerializer(data=request.data)
@@ -75,7 +97,10 @@ class UserViewSet(viewsets.GenericViewSet,
                 otp = OTP.objects.get(user=user, code=serializer.validated_data.get('otp'))
             except:
                 return Response(response.make_messages([_('The code is invalid')]), status.HTTP_400_BAD_REQUEST)
-            otp.delete()
+            otp.delete_for_user(user)
+            if not user.is_active:
+                user.is_active = True
+                user.save()
             return Response(auth.auth_user_data(user, request))
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
@@ -84,7 +109,7 @@ class UserViewSet(viewsets.GenericViewSet,
         serializer = ResendOTPSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                user = MainUser.objects.get(email=serializer.validated_data.get('email'))
+                user = MainUser.objects.get(email=serializer.validated_data.get('email'), is_active=True)
             except:
                 return Response(response.make_messages([_("User with such email doesn't exist")]),
                                 status.HTTP_400_BAD_REQUEST)

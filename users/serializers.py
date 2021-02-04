@@ -89,12 +89,25 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['email', 'profile']
 
     def create(self, validated_data):
-        print(validated_data)
         profile_data = validated_data.pop('profile')
         user = MainUser.objects.create(**validated_data)
         Profile.objects.create(**profile_data, user=user)
         OTP.generate(user, self.context.get('request').headers.get('Accept-Language'))
         return user
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.get('profile')
+        profile = instance.profile
+        profile.name = profile_data.get('name', profile.name)
+        profile.specialization = profile_data.get('specialization', profile.specialization)
+        profile.instagram_username = profile_data.get('instagram_username', profile.instagram_username)
+        profile.avatar = profile_data.get('avatar', profile.avatar)
+        profile.save()
+        instance.email = validated_data.get('email', instance.email)
+        instance.save()
+        OTP.generate(instance, self.context.get('request').headers.get('Accept-Language'))
+        return instance
+
 
 
 class VerifyOTPSerializer(serializers.Serializer):
