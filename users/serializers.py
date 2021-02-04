@@ -75,10 +75,15 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField()
+
     class Meta:
         model = Profile
         fields = '__all__'
         read_only_fields = ['user']
+
+    def get_avatar(self, obj):
+        return self.context.get('request').build_absolute_uri(obj.avatar.url)
 
 
 class RegisterSerializer(serializers.ModelSerializer):
