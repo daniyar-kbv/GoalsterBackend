@@ -100,7 +100,8 @@ class Profile(models.Model):
         return f'{self.id} {self.user}'
 
     def save(self, *args, **kwargs):
-        upload.delete_folder(self.avatar)
+        if self.avatar:
+            upload.delete_folder(self.avatar)
 
         super(Profile, self).save(*args, **kwargs)
 

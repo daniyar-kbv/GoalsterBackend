@@ -75,15 +75,10 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    avatar = serializers.SerializerMethodField()
-
     class Meta:
         model = Profile
         fields = '__all__'
         read_only_fields = ['user']
-
-    def get_avatar(self, obj):
-        return self.context.get('request').build_absolute_uri(obj.avatar.url)
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -94,6 +89,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['email', 'profile']
 
     def create(self, validated_data):
+        print(validated_data)
         profile_data = validated_data.pop('profile')
         user = MainUser.objects.create(**validated_data)
         Profile.objects.create(**profile_data, user=user)
