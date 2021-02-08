@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 
-from main.serializers import GoalAddSerializer
+from main.serializers import GoalAddSerializer, GoalListSerializer
 
 from . import response
 
@@ -20,6 +20,7 @@ def add_goal(request):
     }
     serializer = GoalAddSerializer(data=request.data, context=context)
     if serializer.is_valid():
-        serializer.save(user=request.user)
-        return Response(serializer.data)
+        goal = serializer.save(user=request.user)
+        output_serializer = GoalListSerializer(goal)
+        return Response(output_serializer.data)
     return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
