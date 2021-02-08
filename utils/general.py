@@ -21,6 +21,9 @@ def add_goal(request):
     serializer = GoalAddSerializer(data=request.data, context=context)
     if serializer.is_valid():
         goal = serializer.save(user=request.user)
-        output_serializer = GoalListSerializer(goal)
+        context = {
+            'user': request.user
+        }
+        output_serializer = GoalListSerializer(goal, context=context)
         return Response(output_serializer.data)
     return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
