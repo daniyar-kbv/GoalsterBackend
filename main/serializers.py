@@ -78,7 +78,7 @@ class GoalListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'time', 'is_done', 'observer', 'is_confirmed', 'sphere')
+        fields = ('id', 'name', 'time', 'is_done', 'observer', 'is_confirmed', 'sphere', 'is_public')
 
     def get_observer(self, obj):
         try:
