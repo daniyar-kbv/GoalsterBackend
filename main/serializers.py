@@ -291,7 +291,7 @@ class UserResultsSerializer(serializers.ModelSerializer):
 class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['goal', 'text']
+        fields = ['id', 'goal', 'text']
 
     def create(self, validated_data):
         goal = validated_data.get('goal')
