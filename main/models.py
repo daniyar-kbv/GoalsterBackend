@@ -93,6 +93,7 @@ class Comment(models.Model):
     )
     text = models.TextField()
     is_owner = models.BooleanField(_('Owner'), null=True)
+    is_read = models.BooleanField(_("Is read"), default=False, blank=True)
 
     class Meta:
         verbose_name = _('Comment')

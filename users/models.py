@@ -100,16 +100,20 @@ class Profile(models.Model):
         return f'{self.id} {self.user}'
 
     def save(self, *args, **kwargs):
+        try:
+            this = Profile.objects.get(id=self.id)
+            if this.avatar != self.avatar:
+                this.avatar.delete()
+        except:
+            pass
+
         if self.id is None:
-            saved_image = self.image
-            self.image = None
+            saved_image = self.avatar
+            self.avatar = None
             super(Profile, self).save(*args, **kwargs)
-            self.image = saved_image
+            self.avatar = saved_image
             if 'force_insert' in kwargs:
                 kwargs.pop('force_insert')
-
-        if self.avatar:
-            upload.delete_folder(self.avatar)
 
         super(Profile, self).save(*args, **kwargs)
 

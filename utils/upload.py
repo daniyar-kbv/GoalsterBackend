@@ -6,7 +6,7 @@ def visualization_document_path(instance, filename):
 
 
 def avatar_document_path(instance, filename):
-    return f'avatars/{instance.id}/{filename}'
+    return f'avatars/{filename}'
 
 
 def delete_folder(document):
@@ -17,4 +17,5 @@ def delete_folder(document):
 
 def delete_file(document):
     path = os.path.abspath(document.path)
-    os.remove(path)
+    print(path)
+    # os.remove(path)

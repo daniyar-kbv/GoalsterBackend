@@ -19,7 +19,7 @@ def transaction_created(sender, instance, created=True, **kwargs):
 @receiver(pre_delete, sender=Profile)
 def profile_pre_deleted(sender, instance, created=True, **kwargs):
     if instance.avatar:
-        upload.delete_folder(instance.avatar)
+        upload.delete_file(instance.avatar)
 
 
 @receiver(post_save, sender=OTP)

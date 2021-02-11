@@ -236,7 +236,15 @@ class CommentViewSet(viewsets.GenericViewSet,
 
     def filter_queryset(self, queryset):
         if self.action == 'list':
-            return queryset.filter(goal_id=self.request.query_params.get('goal'))
+            queryset = queryset.filter(goal_id=self.request.query_params.get('goal'))
+            try:
+                goal = Goal.objects.get(id=self.request.query_params.get('goal'))
+            except:
+                return queryset
+            for comment in queryset.filter(is_owner=goal.user != self.request.user):
+                comment.is_read = True
+                comment.save()
+            return queryset
         return queryset
 
     def get_serializer_class(self):

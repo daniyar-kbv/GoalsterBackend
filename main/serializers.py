@@ -75,10 +75,11 @@ class GoalListSerializer(serializers.ModelSerializer):
     observer = serializers.SerializerMethodField()
     sphere = serializers.SerializerMethodField()
     is_confirmed = serializers.SerializerMethodField()
+    new_message = serializers.SerializerMethodField()
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'time', 'is_done', 'observer', 'is_confirmed', 'sphere', 'is_public')
+        fields = ('id', 'name', 'time', 'is_done', 'observer', 'is_confirmed', 'sphere', 'is_public', 'new_message')
 
     def get_observer(self, obj):
         try:
@@ -99,6 +100,9 @@ class GoalListSerializer(serializers.ModelSerializer):
         except:
             return None
         return observation.is_confirmed
+
+    def get_new_message(self, obj):
+        return Comment.objects.filter(goal=obj, is_read=False, is_owner=self.context.get('user') != obj.user).exists()
 
 
 class GoalAddSerializer(serializers.ModelSerializer):
@@ -301,7 +305,8 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         comment = Comment.objects.create(
             **validated_data,
             sender=self.context.get('request').user,
-            is_owner=self.context.get('request').user == goal.user
+            is_owner=self.context.get('request').user == goal.user,
+            is_read=self.context.get('request').user == goal.user
         )
         return comment
 
