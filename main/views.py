@@ -125,8 +125,9 @@ class GoalViewSet(viewsets.GenericViewSet,
         }
         serializer = GoalAddSerializer(instance=goal, data=request.data, context=context)
         if serializer.is_valid():
-            self.perform_update(serializer)
-            return Response(serializer.data)
+            goal = self.perform_update(serializer)
+            out_serializer = GoalListSerializer(goal)
+            return Response(out_serializer.data)
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
