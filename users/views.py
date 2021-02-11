@@ -112,7 +112,7 @@ class UserViewSet(viewsets.GenericViewSet,
                 user = MainUser.objects.get(email=serializer.validated_data.get('email'))
             except:
                 return Response(response.make_messages([_("User with such email doesn't exist")]),
-                                status.HTTP_400_BAD_REQUEST)
+                                status.HTTP_404_NOT_FOUND)
             OTP.generate(user, request.headers.get('Accept-Language'))
             return Response(serializer.data)
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
