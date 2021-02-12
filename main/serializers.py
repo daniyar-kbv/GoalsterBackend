@@ -86,7 +86,7 @@ class GoalListSerializer(serializers.ModelSerializer):
             observation = Observation.objects.get(goal=obj)
         except:
             return None
-        return observation.observer.email
+        return UserShortSerializer(observation.observer).data
 
     def get_sphere(self, obj):
         for index, sphere in enumerate(SelectedSphere.objects.filter(user=self.context.get('user'))):
