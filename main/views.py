@@ -289,8 +289,14 @@ class VisualizationViewSet(viewsets.GenericViewSet,
         }
         serializer = VisualizationCreateSerializer(data=request.data, context=context)
         if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response()
+            visualization = serializer.save(user=request.user)
+            out_serializer = VisualizationListSerializer(visualization, context=request)
+            data = {
+                'id': visualization.sphere.id,
+                'name': visualization.sphere.sphere,
+                'visualizations': out_serializer.data
+            }
+            return Response(data)
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
