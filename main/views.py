@@ -320,7 +320,7 @@ class EmotionsViewSet(viewsets.GenericViewSet,
         serializer = AddEmotionSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
-            return Response()
+            return self.list(request)
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
 
