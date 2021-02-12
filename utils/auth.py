@@ -54,7 +54,7 @@ def auth_user_data(user, request):
         'profile': profile_data,
         'isPremium': user.is_premium,
         'premiumType': premium_type,
-        'premiumEndDate': premium_end_date.strftime(constants.DATE_FORMAT),
+        'premiumEndDate': premium_end_date,
         'notConfirmedCount': Observation.objects.filter(Q(observer=user) & Q(is_confirmed=None)).distinct(
             'observer').count(),
         'showResults': user.show_results
