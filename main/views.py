@@ -290,7 +290,7 @@ class VisualizationViewSet(viewsets.GenericViewSet,
         serializer = VisualizationCreateSerializer(data=request.data, context=context)
         if serializer.is_valid():
             visualization = serializer.save(user=request.user)
-            out_serializer = VisualizationListSerializer(visualization, context=request)
+            out_serializer = VisualizationListSerializer([visualization], many=True, context=request)
             data = {
                 'id': visualization.sphere.id,
                 'name': visualization.sphere.sphere,
