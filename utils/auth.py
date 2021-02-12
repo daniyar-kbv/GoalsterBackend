@@ -28,9 +28,9 @@ def auth_user_data(user, request):
                        f'{_("s") if last_transaction.time_amount > 1 else ""}'
         premium_end_date = (
             last_transaction.created_at + (
-            relativedelta(months=last_transaction.time_amount)
-            if last_transaction.time_unit == constants.MONTH else
-            relativedelta(years=last_transaction.time_amount)
+                relativedelta(months=last_transaction.time_amount)
+                if last_transaction.time_unit == constants.MONTH else
+                relativedelta(years=last_transaction.time_amount)
             )
         ).strftime(constants.DATE_FORMAT)
     for sphere in SelectedSphere.objects.filter(user=user):
@@ -54,7 +54,7 @@ def auth_user_data(user, request):
         'profile': profile_data,
         'isPremium': user.is_premium,
         'premiumType': premium_type,
-        'premiumEndDate': premium_end_date,
+        'premiumEndDate': premium_end_date.strftime(constants.DATE_FORMAT),
         'notConfirmedCount': Observation.objects.filter(Q(observer=user) & Q(is_confirmed=None)).distinct(
             'observer').count(),
         'showResults': user.show_results
