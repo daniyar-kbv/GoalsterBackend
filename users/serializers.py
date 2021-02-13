@@ -56,7 +56,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
-    avatae = serializers.FileField(required=False)
+    avatar = serializers.FileField(required=False)
 
     class Meta:
         model = Profile
