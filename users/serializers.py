@@ -56,6 +56,8 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
+    avatae = serializers.FileField(required=False)
+
     class Meta:
         model = Profile
         fields = ['name', 'specialization', 'instagram_username', 'avatar']
