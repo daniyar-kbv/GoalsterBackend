@@ -72,7 +72,7 @@ def visualization_pre_deleted(sender, instance, created=True, **kwargs):
 @receiver(post_save, sender=Help)
 def help_saved(sender, instance, created=True, **kwargs):
     if created:
-        sent = send_email.delay(
+        send_email.delay(
             'Помощь GOALSTERS',
             f"""От: {instance.user.email}
 
@@ -81,7 +81,7 @@ def help_saved(sender, instance, created=True, **kwargs):
 {instance.created_at.strftime(constants.DATETIME_FORMAT)}""",
             constants.HELP_RECIPIENT_EMAIL
         )
-        instance.is_sent = sent
+        instance.is_sent = True
         instance.save()
 
 
