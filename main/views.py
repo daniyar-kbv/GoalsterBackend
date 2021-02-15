@@ -67,9 +67,16 @@ class SphereViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['post'])
     def test(self, request, pk=None):
-        from dateutil.relativedelta import relativedelta
-        # print(datetime.datetime.now() + relativedelta(months=3))
-        return Response()
+        from users.models import ReactionType
+
+        return Response({
+            map(
+                lambda type: {
+                    "name": type.emoji
+                },
+                ReactionType.objects.all()
+            )
+        })
 
 
 class GoalViewSet(viewsets.GenericViewSet,
