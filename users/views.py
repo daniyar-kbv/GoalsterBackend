@@ -275,7 +275,8 @@ class FeedViewSet(viewsets.GenericViewSet,
         instance.followers.remove(user) \
         if instance.followers.filter(id=user.id).exists() else \
         instance.followers.add(user)
-        return Response()
+        serializer = ProfileFullSerializer(user)
+        return Response(serializer.data)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def react(self, request, pk=None):
@@ -290,5 +291,6 @@ class FeedViewSet(viewsets.GenericViewSet,
         return Response({
             'id': serializer.reaction_type.id,
             'emoji': serializer.reaction_type.emoji,
-            'count': Reaction.objects.filter(user=user, type=serializer.reaction_type).count()
+            'count': Reaction.objects.filter(user=user, type=serializer.reaction_type).count(),
+            'reacted': Reaction.objects.filter(user=user, type=type, sender=request.user).exists()
         })
