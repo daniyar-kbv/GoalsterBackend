@@ -292,5 +292,5 @@ class FeedViewSet(viewsets.GenericViewSet,
             'id': serializer.reaction_type.id,
             'emoji': serializer.reaction_type.emoji,
             'count': Reaction.objects.filter(user=user, type=serializer.reaction_type).count(),
-            'reacted': Reaction.objects.filter(user=user, type=type, sender=request.user).exists()
+            'reacted': Reaction.objects.filter(user=user, type=serializer.reaction_type, sender=request.user).exists()
         })
