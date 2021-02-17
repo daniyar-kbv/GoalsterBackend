@@ -243,8 +243,8 @@ class UserViewSet(viewsets.GenericViewSet,
         })
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
-    def followers(self, request, pk=None):
-        users = request.user.followers.all()
+    def following(self, request, pk=None):
+        users = MainUser.objects.filter(followers=request.user)
         context = {
             'request': request
         }
