@@ -145,10 +145,22 @@ class SelectedSpheresFullSerializer(serializers.ModelSerializer):
         ).count()
 
 
+class FollowingSerializer(serializers.ModelSerializer):
+    profile = ProfileFeedSerialzier()
+
+    class Meta:
+        model = MainUser
+        fields = ['id', 'email', 'profile', 'is_following']
+
+    def get_is_following(self, obj):
+        return obj.followers.filter(id=self.context.get('request').user.id).exists()
+
+
 class FeedSerializer(serializers.ModelSerializer):
     profile = ProfileFeedSerialzier()
     selected = SelectedSpheresFullSerializer(many=True)
     reactions = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
 
     class Meta:
         model = MainUser
