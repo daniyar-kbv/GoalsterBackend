@@ -149,7 +149,6 @@ class FeedSerializer(serializers.ModelSerializer):
     profile = ProfileFeedSerialzier()
     selected = SelectedSpheresFullSerializer(many=True)
     reactions = serializers.SerializerMethodField()
-    is_following = serializers.SerializerMethodField()
 
     class Meta:
         model = MainUser
