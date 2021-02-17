@@ -275,7 +275,10 @@ class FeedViewSet(viewsets.GenericViewSet,
         instance.followers.remove(user) \
         if instance.followers.filter(id=user.id).exists() else \
         instance.followers.add(user)
-        serializer = ProfileFullSerializer(user)
+        context = {
+            'request': request
+        }
+        serializer = ProfileFullSerializer(user, context=context)
         return Response(serializer.data)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
