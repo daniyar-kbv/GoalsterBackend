@@ -202,7 +202,7 @@ class ProfileFullSerializer(FeedSerializer):
 
     def get_goals(self, obj):
         queryset = Goal.objects.filter(user=obj, is_public=True)
-        morning_serializer = Goa(
+        morning_serializer = ProfileGoalsSerializer(
             queryset.filter(time=constants.TIME_MORNING).order_by('created_at'),
             many=True,
             context={
