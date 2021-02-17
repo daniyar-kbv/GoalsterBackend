@@ -287,6 +287,8 @@ class FeedViewSet(viewsets.GenericViewSet,
             reaction = Reaction.objects.get(type=serializer.reaction_type, user=user, sender=request.user)
             reaction.delete()
         except:
+            reactions = Reaction.objects.filter(user=user, sender=request.user)
+            reactions.delete()
             Reaction.objects.create(type=serializer.reaction_type, user=user, sender=request.user)
         return Response({
             'id': serializer.reaction_type.id,
