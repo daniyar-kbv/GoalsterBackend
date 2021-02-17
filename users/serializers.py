@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from main.models import SelectedSphere, Goal
+from main.models import SelectedSphere, Goal, Observation, Comment
 from users.models import MainUser, Transaction, Profile, OTP, ReactionType, Reaction
 from utils import response
 import constants
@@ -168,16 +168,28 @@ class FeedSerializer(serializers.ModelSerializer):
 
 
 class ProfileGoalsSerializer(serializers.ModelSerializer):
+    observer = serializers.SerializerMethodField()
     sphere = serializers.SerializerMethodField()
+    is_confirmed = serializers.SerializerMethodField()
+    new_comment = serializers.SerializerMethodField()
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'time', 'is_done', 'sphere')
+        fields = ('id', 'name', 'time', 'is_done', 'observer', 'is_confirmed', 'sphere', 'is_public', 'new_comment')
+
+    def get_observer(self, obj):
+        return None
 
     def get_sphere(self, obj):
         for index, sphere in enumerate(SelectedSphere.objects.filter(user=self.context.get('user'))):
             if sphere == obj.sphere:
                 return index + 1
+        return None
+
+    def get_is_confirmed(self, obj):
+        return None
+
+    def get_new_comment(self, obj):
         return None
 
 
@@ -189,8 +201,8 @@ class ProfileFullSerializer(FeedSerializer):
         fields = FeedSerializer.Meta.fields + ['goals', 'is_following']
 
     def get_goals(self, obj):
-        queryset = Goal.objects.filter(is_public=True)
-        morning_serializer = ProfileGoalsSerializer(
+        queryset = Goal.objects.filter(user=obj, is_public=True)
+        morning_serializer = Goa(
             queryset.filter(time=constants.TIME_MORNING).order_by('created_at'),
             many=True,
             context={
