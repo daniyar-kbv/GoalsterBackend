@@ -287,7 +287,7 @@ class FeedViewSet(viewsets.GenericViewSet,
         context = {
             'request': request
         }
-        serializer = ProfileFullSerializer(user, context=context)
+        serializer = ProfileFullSerializer(instance, context=context)
         return Response(serializer.data)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
