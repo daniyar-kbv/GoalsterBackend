@@ -11,7 +11,7 @@ from users.models import MainUser, Transaction, OTP, Reaction, Profile
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
     ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer, UserVerifyActivationEmailSerializer, \
     RegisterSerializer, VerifyOTPSerializer, ResendOTPSerializer, FeedSerializer, ReactSerializer, \
-    ProfileFullSerializer, ProfileSerializer, UpdateProfileSerializer, FollowingSerializer
+    ProfileFullSerializer, ProfileSerializer, UpdateProfileSerializer
 from main.tasks import after_three_days, send_email
 from main.models import SelectedSphere, Observation, UserResults
 from main.serializers import UserResultsSerializer
@@ -248,7 +248,7 @@ class UserViewSet(viewsets.GenericViewSet,
         context = {
             'request': request
         }
-        serializer = FollowingSerializer(users, many=True, context=context)
+        serializer = ProfileFullSerializer(users, many=True, context=context)
         return Response(serializer.data)
 
 
