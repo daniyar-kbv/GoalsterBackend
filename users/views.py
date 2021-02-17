@@ -242,6 +242,15 @@ class UserViewSet(viewsets.GenericViewSet,
             'email': email
         })
 
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def followers(self, request, pk=None):
+        users = request.user.followers.all()
+        context = {
+            'request': request
+        }
+        serializer = FeedSerializer(users, many=True, context=context)
+        return Response(serializer.data)
+
 
 class FeedViewSet(viewsets.GenericViewSet,
                   mixins.ListModelMixin,
