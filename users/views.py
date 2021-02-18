@@ -256,6 +256,7 @@ class FeedViewSet(viewsets.GenericViewSet,
                   mixins.ListModelMixin,
                   mixins.RetrieveModelMixin):
     queryset = MainUser.objects.filter(is_superuser=False, profile__isnull=False)
+    permission_classes = []
 
     def filter_queryset(self, queryset):
         if self.action == 'list':
