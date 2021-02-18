@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Case, When
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
 from rest_framework import viewsets, mixins
@@ -266,14 +266,21 @@ class FeedViewSet(viewsets.GenericViewSet,
                 selected_count=Count('selected')
             ).filter(
                 ~Q(id=self.request.user.id) &
-                Q(selected_count__gt=0)
+                Q(selected_count__gt=0) &
+                Q(in_recommendations=True)
             )
+            queryset = queryset.annotate(
+                goals_count=Count(
+                    Case(When(Q(goals__date=datetime.datetime.today()) & Q(goals__is_public=True), then=1))
+                )
+            ).filter(goals_count__gt=0)
             if type == constants.FEED_TYPE_RECOMMENDATIONS:
+                queryset = queryset.order_by('-is_special', '-created_at')
                 if not isinstance(self.request.user, AnonymousUser):
                     queryset = queryset.filter(~Q(followers=self.request.user))
             elif type == constants.FEED_TYPE_FOLLOWING:
                 queryset = queryset.filter(followers=self.request.user)
-        return queryset
+        return queryset.distinct()
 
     def get_serializer_class(self):
         if self.action == 'retrieve':

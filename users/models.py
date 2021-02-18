@@ -60,6 +60,8 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(_('Is admin'), default=False)
     is_active = models.BooleanField(_('Is active'), default=True)
     show_results = models.BooleanField(_('Show results'), default=False)
+    in_recommendations = models.BooleanField(_('In recommendations'), default=True)
+    is_special = models.BooleanField(_('Special'), default=False)
 
     objects = MainUserManager()
 
