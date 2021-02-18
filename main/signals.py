@@ -90,7 +90,7 @@ def comment_saved(sender, instance, created=True, **kwargs):
     if created:
         data = {
             'type': constants.NOTIFICATION_COMMENT,
-            'date': instance.goal.date.strftime(constants.DATE_FORMAT),
+            'date': instance.goal.date.strftime(constants.DATETIME_FORMAT),
             'id': instance.goal.id
         }
         goal = instance.goal
