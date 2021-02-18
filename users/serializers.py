@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AnonymousUser
 from rest_framework import serializers
 from main.models import SelectedSphere, Goal, Observation, Comment
 from users.models import MainUser, Transaction, Profile, OTP, ReactionType, Reaction
@@ -162,6 +163,7 @@ class FeedSerializer(serializers.ModelSerializer):
                 'emoji': type.emoji,
                 'count': Reaction.objects.filter(user=obj, type=type).count(),
                 'reacted': Reaction.objects.filter(user=obj, type=type, sender=self.context.get('request').user).exists()
+                    if not isinstance(self.context.get('request').user, AnonymousUser) else None
             },
             ReactionType.objects.all()
         )

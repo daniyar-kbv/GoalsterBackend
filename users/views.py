@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db.models import Q, Count
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
@@ -256,7 +257,7 @@ class FeedViewSet(viewsets.GenericViewSet,
                   mixins.ListModelMixin,
                   mixins.RetrieveModelMixin):
     queryset = MainUser.objects.filter(is_superuser=False, profile__isnull=False)
-    permission_classes = []
+    permission_classes = [permissions.IsAuthenticated]
 
     def filter_queryset(self, queryset):
         if self.action == 'list':
@@ -268,7 +269,8 @@ class FeedViewSet(viewsets.GenericViewSet,
                 Q(selected_count__gt=0)
             )
             if type == constants.FEED_TYPE_RECOMMENDATIONS:
-                queryset = queryset.filter(~Q(followers=self.request.user))
+                if not isinstance(self.request.user, AnonymousUser):
+                    queryset = queryset.filter(~Q(followers=self.request.user))
             elif type == constants.FEED_TYPE_FOLLOWING:
                 queryset = queryset.filter(followers=self.request.user)
         return queryset
@@ -277,6 +279,12 @@ class FeedViewSet(viewsets.GenericViewSet,
         if self.action == 'retrieve':
             return ProfileFullSerializer
         return FeedSerializer
+
+    def get_permissions(self):
+        if self.action == 'list' and \
+                self.request.query_params.get('type', constants.FEED_TYPE_RECOMMENDATIONS) == constants.FEED_TYPE_RECOMMENDATIONS:
+            return []
+        return [permission() for permission in self.permission_classes]
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def follow(self, request, pk=None):
