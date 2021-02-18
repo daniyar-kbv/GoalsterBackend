@@ -16,7 +16,7 @@ from users.serializers import UserSendActivationEmailSerializer, UserShortSerial
 from main.tasks import after_three_days, send_email
 from main.models import SelectedSphere, Observation, UserResults
 from main.serializers import UserResultsSerializer
-from utils import encoding, response, permissions, emails, general, auth
+from utils import encoding, response, permissions, emails, general, auth, time
 import constants, datetime
 
 
@@ -271,7 +271,7 @@ class FeedViewSet(viewsets.GenericViewSet,
             )
             queryset = queryset.annotate(
                 goals_count=Count(
-                    Case(When(Q(goals__date=datetime.datetime.today()) & Q(goals__is_public=True), then=1))
+                    Case(When(Q(goals__date=time.get_local_dt().date()) & Q(goals__is_public=True), then=1))
                 )
             ).filter(goals_count__gt=0)
             if type == constants.FEED_TYPE_RECOMMENDATIONS:

@@ -3,8 +3,8 @@ from django.contrib.auth.models import AnonymousUser
 from rest_framework import serializers
 from main.models import SelectedSphere, Goal, Observation, Comment
 from users.models import MainUser, Transaction, Profile, OTP, ReactionType, Reaction
-from utils import response
-import constants
+from utils import response, time
+import constants, datetime
 
 
 class UserSendActivationEmailSerializer(serializers.Serializer):
@@ -203,7 +203,7 @@ class ProfileFullSerializer(FeedSerializer):
         fields = FeedSerializer.Meta.fields + ['goals', 'is_following', 'email']
 
     def get_goals(self, obj):
-        queryset = Goal.objects.filter(user=obj, is_public=True)
+        queryset = Goal.objects.filter(user=obj, is_public=True, date=time.get_local_dt().date())
         morning_serializer = ProfileGoalsSerializer(
             queryset.filter(time=constants.TIME_MORNING).order_by('created_at'),
             many=True,
