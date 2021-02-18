@@ -157,10 +157,6 @@ CELERY_BEAT_SCHEDULE = {
     'backups': {
         'task': 'main.tasks.backup',
         'schedule': crontab(hour=0, minute=0, day_of_month='*/2')
-    },
-    'send_invite_notification': {
-        'task': 'main.tasks.send_invite_notification',
-        'schedule': crontab(minute=0, hour=18, day_of_week='1,4'),
     }
 }
 

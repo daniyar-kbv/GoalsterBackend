@@ -115,11 +115,13 @@ FCM_SEND_URL = 'https://fcm.googleapis.com/fcm/send'
 NOTIFICATION_3DAYS = 1
 NOTIFICATION_BEFORE_END = 2
 NOTIFICATION_END = 3
+NOTIFICATION_COMMENT = 4
 
 NOTIFICATION_TYPES = (
     (NOTIFICATION_3DAYS, '3 inactive days'),
     (NOTIFICATION_BEFORE_END, 'Before end of period'),
-    (NOTIFICATION_END, 'End of period')
+    (NOTIFICATION_END, 'End of period'),
+    (NOTIFICATION_COMMENT, 'New commetn')
 )
 
 THREE_DAYS_TITLE_RU = 'Ты 3 дня не заходил в приложение 24Goals.'
