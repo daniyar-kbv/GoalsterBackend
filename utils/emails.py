@@ -40,8 +40,7 @@ def generate_activation_email_v2(request, language, otp):
         bottom_2 = constants.EMAIL_BOTTOM_2_EN
         body_1 = constants.EMAIL_CODE_BODY_EN
         body_2 = constants.EMAIL_CODE_BODY_2_EN
-    # base_url = '/'.join(request.build_absolute_uri().split('/')[0:3])
-    base_url = 'http://192.168.1.19:8000'
+    base_url = '/'.join(request.build_absolute_uri().split('/')[0:3])
     context = {
         'email_top': email_top,
         'bottom_1': bottom_1,
