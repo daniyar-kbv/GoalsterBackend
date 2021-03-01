@@ -176,3 +176,42 @@ TOPIC_INVITE_TEXT_RU = 'Пригласи друга или стань наблю
 
 FEED_TYPE_FOLLOWING = 'following'
 FEED_TYPE_RECOMMENDATIONS = 'recommendations'
+
+EMAIL_TOP_EN = "Hi! I am Yerkezhan and I am the founder of 24Goals."
+EMAIL_TOP_RU =  "Привет! Я Еркежан и я основатель 24Goals."
+
+EMAIL_CODE_BODY_EN = "Thank you for downloading my mobile app!\nI have created an account for you and it is almost ready.\nI just need you to verify your details by\nactivating your account using the code below."
+EMAIL_CODE_BODY_RU = "Благодарю тебя за загрузку моего приложения!\nЯ создала для тебя аккаунт и он почти готов.\nМне просто нужно, чтобы ты подтвердил свои данные,\nактивировав свою учетную запись, используя код ниже."
+
+EMAIL_CODE_BODY_2_EN = "24Goals is a new social network where users\ncan plan, share their daily schedule,\ninspire and be inspired by others, set reactions,\nsubscribe, find like-minded people and a mentor,\nand develop networking through an internal messenger."
+EMAIL_CODE_BODY_2_RU = "24Goals - это новая социальная сеть, в которой пользователи\nмогут планировать, делиться своим расписанием дня,\nвдохновлять и вдохновляться другими, ставить реакции,\nподписываться, находить единомышленников и наставника,\nразвивать нетворкинг путем внутренного мессенджера. "
+
+EMAIL_BOTTOM_1_EN = "You can contact us at any time and leave a request.\nWe value our users and will not disregard your request."
+EMAIL_BOTTOM_1_RU = "Ты в любое время можете обратиться к нам в разделе «помощь».\nМы ценим наших пользователей и не оставим без внимания твой запрос."
+
+EMAIL_BOTTOM_2_EN = "Follow our useful community on Instagram:"
+EMAIL_BOTTOM_2_RU = "Будь подписан на наш полезный комьюнити в Инстаграм -"
+
+EMAIL_MENTOR_BODY_1_EN = "You have been selected as an mentor in the 24Goals app!"
+EMAIL_MENTOR_BODY_1_RU = "Тебя выбрали в качестве наставника в приложении 24Goals!"
+
+EMAIL_MENTOR_BODY_2_EN = "Go to the 24Goals app and go to the \"Profile\" tab.\nClick on the \"Observing\" tab and confirm yourself as a mentor.\nThank you very much!"
+EMAIL_MENTOR_BODY_2_RU = "Зайди в приложение 24Goals и перейди во вкладку «Профиль».\nНажми на вкладку «Наблюдаю» и подтверди себя наставником.\nСпасибо тебе большое!"
+
+EMAIL_PURCHASE_BODY_1_EN = "Congratulations on your purchase the premium version in the 24Goals app!"
+EMAIL_PURCHASE_BODY_1_RU = "Поздравляю тебя с покупкой премиум версии в приложении 24Goals!"
+
+EMAIL_PURCHASE_BODY_2_EN = "Smart decision."
+EMAIL_PURCHASE_BODY_2_RU =  "Умное решение."
+
+EMAIL_PURCHASE_BODY_3_EN = "As a gift to your subscription, I made file with the tips for\ndesigning a visualization board and a to-do list\nfor effective thinking."
+EMAIL_PURCHASE_BODY_3_RU = "В подарок к подписке я составила для тебя советы по\nоформлению доски визуализации и чек-лист\nпо эффективному мышлению."
+
+EMAIL_PURCHASE_BODY_4_EN = "Download from the link below.\nTune in to positive results and use the app daily."
+EMAIL_PURCHASE_BODY_4_RU = "Настройся на позитивные результаты и используй\nприложение ежедневно."
+
+EMAIL_PURCHASE_BODY_5_EN = "Link to download materials"
+EMAIL_PURCHASE_BODY_5_RU = "Ссылка на скачивание материалов"
+
+EMAIL_PURCHASE_LINK_EN = "https://drive.google.com/file/d/1376sapAOrObcBNwp_4iYcXjs6HXO0jX1/view?usp=sharing"
+EMAIL_PURCHASE_LINK_RU = "https://drive.google.com/file/d/1xr5NJBsBXhhl6G4G9JjbKThSW5DyxFj2/view?usp=sharing"

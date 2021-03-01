@@ -221,6 +221,22 @@ class UserViewSet(viewsets.GenericViewSet,
             return Response()
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def premium_v2(self, request, pk=None):
+        serializer = TransactionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            if request.headers.get('Accept-Language') == 'ru-ru':
+                subject = constants.PREMIUM_EMAIL_SUBJECT_RU
+            else:
+                subject = constants.PREMIUM_EMAIL_SUBJECT_EN
+            send_email.delay(subject,
+                             emails.generate_premium_email_v2(request.headers.get('Accept-Language')),
+                             request.user.email,
+                             html=True)
+            return Response()
+        return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
+
     @action(detail=False, methods=['put'], permission_classes=[permissions.IsAuthenticated])
     def update_profile(self, request, pk=None):
         email = request.data.get('email')

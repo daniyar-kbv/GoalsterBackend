@@ -40,14 +40,26 @@ def observation_saved(sender, instance, created=True, **kwargs):
                         version = 3
                     elif instance._request.path.__contains__('v4'):
                         version = 4
-                    body = emails.generate_observation_confirmation_email(
-                        instance.observer.email,
-                        'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us',
-                        version
-                    )
-                    send_email.delay(subject,
-                                     body,
-                                     instance.observer.email)
+                    elif instance._request.path.__contains__('v5'):
+                        version = 5
+                    if version < 5:
+                        body = emails.generate_observation_confirmation_email(
+                            instance.observer.email,
+                            'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us',
+                            version
+                        )
+                        send_email.delay(subject,
+                                         body,
+                                         instance.observer.email)
+                    else:
+                        send_email.delay(
+                            subject,
+                            emails.generate_observation_confirmation_email_v2(
+                                'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us'
+                            ),
+                            instance.observer.email,
+                            html=True
+                        )
 
 
 @receiver(pre_delete, sender=Observation)

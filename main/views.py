@@ -65,18 +65,12 @@ class SphereViewSet(viewsets.GenericViewSet,
                 'spheres': serializer_data
             })
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['get'])
     def test(self, request, pk=None):
-        from users.models import ReactionType
-
-        return Response({
-            map(
-                lambda type: {
-                    "name": type.emoji
-                },
-                ReactionType.objects.all()
-            )
-        })
+        from django.shortcuts import render
+        code = '1234'
+        print(render(request, 'code.html', { 'code': code }).content)
+        return render(request, 'code.html', { 'code': code })
 
 
 class GoalViewSet(viewsets.GenericViewSet,
@@ -188,6 +182,10 @@ class GoalViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def add_v4(self, request, pk=None):
+        return general.add_goal(request)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def add_v5(self, request, pk=None):
         return general.add_goal(request)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated, permissions.OwnerPermission])
