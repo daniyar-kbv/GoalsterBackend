@@ -67,8 +67,23 @@ class SphereViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['get'])
     def test(self, request, pk=None):
-        print('/'.join(request.build_absolute_uri().split('/')[0:3]))
-        return Response()
+        from django.shortcuts import render
+        email_top = constants.EMAIL_TOP_RU
+        bottom_1 = constants.EMAIL_BOTTOM_1_RU
+        bottom_2 = constants.EMAIL_BOTTOM_2_RU
+        body_1 = constants.EMAIL_CODE_BODY_RU
+        body_2 = constants.EMAIL_CODE_BODY_2_RU
+        base_url = '/'.join(request.build_absolute_uri().split('/')[0:3])
+        context = {
+            'email_top': email_top,
+            'bottom_1': bottom_1,
+            'bottom_2': bottom_2,
+            'body_1': body_1,
+            'body_2': body_2,
+            'code': '1234',
+            'base_url': base_url
+        }
+        return render(request, 'code.html', context)
 
 
 class GoalViewSet(viewsets.GenericViewSet,
