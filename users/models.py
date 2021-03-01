@@ -152,7 +152,7 @@ class OTP(models.Model):
         return f'{self.id} {self.user} {self.code}'
 
     @staticmethod
-    def generate(user, language):
+    def generate(user, language, request):
         from main.tasks import send_email
         code = ''.join([str(random.randint(0, 9)) for _ in range(4)])
         while OTP.objects.filter(code=code).exists():
@@ -165,6 +165,7 @@ class OTP(models.Model):
         send_email.delay(
             subject,
             emails.generate_activation_email_v2(
+                request,
                 language,
                 otp.code
             ),

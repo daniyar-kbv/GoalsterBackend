@@ -95,7 +95,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile')
         user = MainUser.objects.create(**validated_data)
         Profile.objects.create(**profile_data, user=user)
-        OTP.generate(user, self.context.get('request').headers.get('Accept-Language'))
+        OTP.generate(user, self.context.get('request').headers.get('Accept-Language'), self.context.get('request'))
         return user
 
     def update(self, instance, validated_data):
@@ -108,7 +108,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         profile.save()
         instance.email = validated_data.get('email', instance.email)
         instance.save()
-        OTP.generate(instance, self.context.get('request').headers.get('Accept-Language'))
+        OTP.generate(instance, self.context.get('request').headers.get('Accept-Language'), self.context.get('request'))
         return instance
 
 

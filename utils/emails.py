@@ -27,7 +27,7 @@ def generate_activation_email(email, language, version):
 {end}"""
 
 
-def generate_activation_email_v2(language, otp):
+def generate_activation_email_v2(request, language, otp):
     if language == 'ru-ru':
         email_top = constants.EMAIL_TOP_RU
         bottom_1 = constants.EMAIL_BOTTOM_1_RU
@@ -40,13 +40,15 @@ def generate_activation_email_v2(language, otp):
         bottom_2 = constants.EMAIL_BOTTOM_2_EN
         body_1 = constants.EMAIL_CODE_BODY_EN
         body_2 = constants.EMAIL_CODE_BODY_2_EN
+    base_url = '/'.join(request.build_absolute_uri().split('/')[0:3])
     context = {
         'email_top': email_top,
         'bottom_1': bottom_1,
         'bottom_2': bottom_2,
         'body_1': body_1,
         'body_2': body_2,
-        'code': otp
+        'code': otp,
+        'base_url': base_url
     }
     return render_to_string('code.html', context)
 
@@ -60,7 +62,7 @@ def generate_premium_email(language):
 """
 
 
-def generate_premium_email_v2(language):
+def generate_premium_email_v2(request, language):
     if language == 'ru-ru':
         email_top = constants.EMAIL_TOP_RU
         bottom_1 = constants.EMAIL_BOTTOM_1_RU
@@ -81,6 +83,7 @@ def generate_premium_email_v2(language):
         body_4 = constants.EMAIL_PURCHASE_BODY_4_EN
         body_5 = constants.EMAIL_PURCHASE_BODY_5_EN
         link = constants.EMAIL_PURCHASE_LINK_EN
+    base_url = '/'.join(request.build_absolute_uri().split('/')[0:3])
     context = {
         'email_top': email_top,
         'bottom_1': bottom_1,
@@ -90,7 +93,8 @@ def generate_premium_email_v2(language):
         'body_3': body_3,
         'body_4': body_4,
         'body_5': body_5,
-        'link': link
+        'link': link,
+        'base_url': base_url
     }
     return render_to_string('purchase.html', context)
 
@@ -117,7 +121,7 @@ def generate_observation_confirmation_email(email, language, version):
 {end}"""
 
 
-def generate_observation_confirmation_email_v2(language):
+def generate_observation_confirmation_email_v2(request, language):
     if language == 'ru-ru':
         email_top = constants.EMAIL_TOP_RU
         bottom_1 = constants.EMAIL_BOTTOM_1_RU
@@ -130,11 +134,13 @@ def generate_observation_confirmation_email_v2(language):
         bottom_2 = constants.EMAIL_BOTTOM_2_EN
         body_1 = constants.EMAIL_MENTOR_BODY_1_EN
         body_2 = constants.EMAIL_MENTOR_BODY_2_EN
+    base_url = '/'.join(request.build_absolute_uri().split('/')[0:3])
     context = {
         'email_top': email_top,
         'bottom_1': bottom_1,
         'bottom_2': bottom_2,
         'body_1': body_1,
-        'body_2': body_2
+        'body_2': body_2,
+        'base_url': base_url
     }
     return render_to_string('mentor.html', context)

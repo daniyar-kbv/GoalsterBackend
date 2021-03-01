@@ -67,10 +67,8 @@ class SphereViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['get'])
     def test(self, request, pk=None):
-        from django.shortcuts import render
-        code = '1234'
-        print(render(request, 'code.html', { 'code': code }).content)
-        return render(request, 'code.html', { 'code': code })
+        print('/'.join(request.build_absolute_uri().split('/')[0:3]))
+        return Response()
 
 
 class GoalViewSet(viewsets.GenericViewSet,

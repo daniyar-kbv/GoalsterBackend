@@ -114,7 +114,7 @@ class UserViewSet(viewsets.GenericViewSet,
             except:
                 return Response(response.make_messages([_("User with such email doesn't exist")]),
                                 status.HTTP_404_NOT_FOUND)
-            OTP.generate(user, request.headers.get('Accept-Language'))
+            OTP.generate(user, request.headers.get('Accept-Language'), request)
             return Response(serializer.data)
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
@@ -231,7 +231,7 @@ class UserViewSet(viewsets.GenericViewSet,
             else:
                 subject = constants.PREMIUM_EMAIL_SUBJECT_EN
             send_email.delay(subject,
-                             emails.generate_premium_email_v2(request.headers.get('Accept-Language')),
+                             emails.generate_premium_email_v2(request, request.headers.get('Accept-Language')),
                              request.user.email,
                              html=True)
             return Response()
