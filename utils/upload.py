@@ -17,5 +17,4 @@ def delete_folder(document):
 
 def delete_file(document):
     path = os.path.abspath(document.path)
-    print(path)
-    # os.remove(path)
+    os.remove(path)

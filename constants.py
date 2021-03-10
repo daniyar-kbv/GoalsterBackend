@@ -121,7 +121,7 @@ NOTIFICATION_TYPES = (
     (NOTIFICATION_3DAYS, '3 inactive days'),
     (NOTIFICATION_BEFORE_END, 'Before end of period'),
     (NOTIFICATION_END, 'End of period'),
-    (NOTIFICATION_COMMENT, 'New commetn')
+    (NOTIFICATION_COMMENT, 'New comment')
 )
 
 THREE_DAYS_TITLE_RU = 'Ты 3 дня не заходил в приложение 24Goals.'

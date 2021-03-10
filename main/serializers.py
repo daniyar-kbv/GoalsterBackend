@@ -73,15 +73,24 @@ class UpdateSpheresSerializer(serializers.ModelSerializer):
 
 class GoalListSerializer(serializers.ModelSerializer):
     observer = serializers.SerializerMethodField()
+    observer_data = serializers.SerializerMethodField()
     sphere = serializers.SerializerMethodField()
     is_confirmed = serializers.SerializerMethodField()
     new_comment = serializers.SerializerMethodField()
 
     class Meta:
         model = Goal
-        fields = ('id', 'name', 'time', 'is_done', 'observer', 'is_confirmed', 'sphere', 'is_public', 'new_comment')
+        fields = ('id', 'name', 'time', 'is_done', 'observer', 'observer_data', 'is_confirmed', 'sphere', 'is_public',
+                  'new_comment')
 
     def get_observer(self, obj):
+        try:
+            observation = Observation.objects.get(goal=obj)
+        except:
+            return None
+        return observation.observer.email
+
+    def get_observer_data(self, obj):
         try:
             observation = Observation.objects.get(goal=obj)
         except:
