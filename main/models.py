@@ -152,7 +152,7 @@ class Visualization(models.Model):
             elif exif.get(orientation) == 8:
                 image = image.rotate(90, expand=True)
 
-        image.save(self.image.path, quality=100, optimize=True)
+        image.save(self.image.path, quality=20, optimize=True)
 
 
 class UserAnswer(models.Model):
