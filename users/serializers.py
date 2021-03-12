@@ -235,7 +235,7 @@ class ProfileFullSerializer(FeedSerializer):
         return data
 
     def get_is_following(self, obj):
-        return obj.followers.filter(id=self.context.get('request').user.id).exists()
+        return obj.followers.filter(follower=self.context.get('request').user).exists()
 
 
 class ReactSerializer(serializers.Serializer):

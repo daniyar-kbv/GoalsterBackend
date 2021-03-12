@@ -1,5 +1,5 @@
 from django.contrib import admin
-from users.models import MainUser, Transaction, Profile, OTP, ReactionType
+from users.models import MainUser, Transaction, Profile, OTP, ReactionType, FollowModel
 from main.models import SelectedSphere, UserAnswer, Visualization, Goal, UserResults
 
 
@@ -67,6 +67,12 @@ class MainUserAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         request._obj_ = obj
         return super(MainUserAdmin, self).get_form(request, obj, **kwargs)
+
+
+@admin.register(FollowModel)
+class FollowModelAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'follower']
+    search_fields = ['user__email', 'follower__email']
 
 
 @admin.register(ReactionType)

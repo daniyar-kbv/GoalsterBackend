@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_jwt.settings import api_settings
-from users.models import MainUser, Transaction, OTP, Reaction, Profile
+from users.models import MainUser, Transaction, OTP, Reaction, Profile, FollowModel
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
     ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer, UserVerifyActivationEmailSerializer, \
     RegisterSerializer, VerifyOTPSerializer, ResendOTPSerializer, FeedSerializer, ReactSerializer, \
@@ -261,7 +261,7 @@ class UserViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def following(self, request, pk=None):
-        users = MainUser.objects.filter(followers=request.user)
+        users = MainUser.objects.filter(following__follower=request.user)
         context = {
             'request': request
         }
@@ -293,9 +293,9 @@ class FeedViewSet(viewsets.GenericViewSet,
             if type == constants.FEED_TYPE_RECOMMENDATIONS:
                 queryset = queryset.order_by('-is_special', '-created_at')
                 if not isinstance(self.request.user, AnonymousUser):
-                    queryset = queryset.filter(~Q(followers=self.request.user))
+                    queryset = queryset.filter(~Q(followers__follower=self.request.user))
             elif type == constants.FEED_TYPE_FOLLOWING:
-                queryset = queryset.filter(followers=self.request.user)
+                queryset = queryset.filter(followers__follower=self.request.user)
         return queryset.distinct()
 
     def get_serializer_class(self):
@@ -313,9 +313,11 @@ class FeedViewSet(viewsets.GenericViewSet,
     def follow(self, request, pk=None):
         instance = self.get_object()
         user = request.user
-        instance.followers.remove(user) \
-        if instance.followers.filter(id=user.id).exists() else \
-        instance.followers.add(user)
+        try:
+            follow = FollowModel.objects.get(user=instance, follower=user)
+            follow.delete()
+        except:
+            FollowModel.objects.create(user=instance, follower=user)
         context = {
             'request': request
         }

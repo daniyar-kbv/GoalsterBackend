@@ -49,12 +49,6 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
         default=False,
         blank=True
     )
-    followers = models.ManyToManyField(
-        'self',
-        related_name='following',
-        verbose_name=_('Followers'),
-        blank=True
-    )
 
     is_premium = models.BooleanField(_('Premium'), default=False, blank=True)
     is_staff = models.BooleanField(_('Is admin'), default=False)
@@ -76,6 +70,28 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'{self.id}: {self.email}'
+
+
+class FollowModel(models.Model):
+    user = models.ForeignKey(
+        MainUser,
+        on_delete=models.CASCADE,
+        related_name='followers',
+        verbose_name=_('User'),
+    )
+    follower = models.ForeignKey(
+        MainUser,
+        on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name=_('Follower'),
+    )
+
+    class Meta:
+        verbose_name = _('Follow')
+        verbose_name_plural = _('Follows')
+
+    def __str__(self):
+        return f'({self.id}) {self.user.email} <- {self.follower.email}'
 
 
 class Profile(models.Model):
@@ -237,4 +253,3 @@ class Reaction(models.Model):
 
     def __str__(self):
         return f'{self.id} {self.user} {self.type}'
-
