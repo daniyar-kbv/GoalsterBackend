@@ -161,8 +161,8 @@ class FeedSerializer(serializers.ModelSerializer):
             {
                 'id': type.id,
                 'emoji': type.emoji,
-                'count': Reaction.objects.filter(user=obj, type=type).count(),
-                'reacted': Reaction.objects.filter(user=obj, type=type, sender=self.context.get('request').user).exists()
+                'count': Reaction.objects.filter(user=obj, type=type, created_at__date=time.get_local_dt().date()).count(),
+                'reacted': Reaction.objects.filter(user=obj, type=type, created_at__date=time.get_local_dt().date(), sender=self.context.get('request').user).exists()
                     if not isinstance(self.context.get('request').user, AnonymousUser) else None
             },
             ReactionType.objects.all()

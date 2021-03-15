@@ -246,6 +246,7 @@ class Reaction(models.Model):
         verbose_name=_('Type'),
         related_name='reactions'
     )
+    created_at = models.DateTimeField(_('Creation date'), auto_now_add=True, blank=True)
 
     class Meta:
         verbose_name = _('Reaction')

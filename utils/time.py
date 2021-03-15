@@ -3,9 +3,6 @@ from django.utils import timezone
 import pytz, datetime
 
 
-# def convert_datetime_to_local
-
-
 def get_local_dt():
     server_tz = pytz.timezone(settings.TIME_ZONE)
     server = server_tz.localize(datetime.datetime.now())

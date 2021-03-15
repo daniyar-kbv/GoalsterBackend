@@ -1,5 +1,5 @@
 from django.contrib import admin
-from users.models import MainUser, Transaction, Profile, OTP, ReactionType, FollowModel
+from users.models import MainUser, Transaction, Profile, OTP, ReactionType, FollowModel, Reaction
 from main.models import SelectedSphere, UserAnswer, Visualization, Goal, UserResults
 
 
@@ -78,3 +78,8 @@ class FollowModelAdmin(admin.ModelAdmin):
 @admin.register(ReactionType)
 class ReactionTypeAdmin(admin.ModelAdmin):
     list_display = ['id', 'emoji']
+
+
+@admin.register(Reaction)
+class ReactionAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'type', 'created_at']

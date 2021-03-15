@@ -330,15 +330,19 @@ class FeedViewSet(viewsets.GenericViewSet,
         serializer.is_valid(raise_exception=True)
         user = self.get_object()
         try:
-            reaction = Reaction.objects.get(type=serializer.reaction_type, user=user, sender=request.user)
+            reaction = Reaction.objects.get(type=serializer.reaction_type, user=user, sender=request.user,
+                                            created_at__date=time.get_local_dt().date())
             reaction.delete()
         except:
-            reactions = Reaction.objects.filter(user=user, sender=request.user)
+            reactions = Reaction.objects.filter(user=user, sender=request.user,
+                                                created_at__date=time.get_local_dt().date())
             reactions.delete()
             Reaction.objects.create(type=serializer.reaction_type, user=user, sender=request.user)
         return Response({
             'id': serializer.reaction_type.id,
             'emoji': serializer.reaction_type.emoji,
-            'count': Reaction.objects.filter(user=user, type=serializer.reaction_type).count(),
-            'reacted': Reaction.objects.filter(user=user, type=serializer.reaction_type, sender=request.user).exists()
+            'count': Reaction.objects.filter(user=user, type=serializer.reaction_type,
+                                             created_at__date=time.get_local_dt().date()).count(),
+            'reacted': Reaction.objects.filter(user=user, type=serializer.reaction_type, sender=request.user,
+                                               created_at__date=time.get_local_dt().date()).exists()
         })

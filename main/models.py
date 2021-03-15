@@ -134,14 +134,18 @@ class Visualization(models.Model):
             if 'force_insert' in kwargs:
                 kwargs.pop('force_insert')
 
+        # Вызов коструктора
         super(Visualization, self).save(*args, **kwargs)
 
+        # Вытаскивается изображение
         image = Image.open(self.image.path)
 
+        # Находим тэг изображения связаный с ориентацией
         for orientation in ExifTags.TAGS.keys():
             if ExifTags.TAGS[orientation] == 'Orientation':
                 break
 
+        # Бывает при сохранении избражение поворачивется, тут ставим его назад
         if image._getexif():
             exif = dict(image._getexif().items())
 
@@ -152,6 +156,7 @@ class Visualization(models.Model):
             elif exif.get(orientation) == 8:
                 image = image.rotate(90, expand=True)
 
+        # Сохраняем избражение и в параметр quality передаем значение качкества сжатия в процентах
         image.save(self.image.path, quality=20, optimize=True)
 
 

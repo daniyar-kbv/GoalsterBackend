@@ -4,7 +4,7 @@ from django.core.management import call_command
 from django.core.mail import EmailMessage
 from django.utils import timezone
 from django.conf import settings
-from users.models import MainUser, Transaction, OTP
+from users.models import MainUser, Transaction, OTP, Reaction
 from main.models import SelectedSphere, UserAnswer, UserResults, Goal
 from utils.notifications import send_notification, get_topic_text
 from dateutil.relativedelta import relativedelta
@@ -124,3 +124,10 @@ def delete_otp(id):
     except:
         return
     otp.delete()
+
+
+@shared_task
+def delete_reactions():
+    week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
+    reactions = Reaction.objects.filter(created_at__lte=week_ago)
+    reactions.delete()
