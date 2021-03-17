@@ -190,6 +190,11 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = int(os.environ.get('EMAIL_USE_TLS'))
 EMAIL_USE_SSL = int(os.environ.get('EMAIL_USE_SSL'))
 
+if not DEBUG:
+    DKIM_SELECTOR = os.environ.get('DKIM_SELECTOR')
+    DKIM_DOMAIN = os.environ.get('DKIM_DOMAIN')
+    DKIM_PRIVATE_KEY = open('key.pub', 'r').read()
+
 AUTH_USER_MODEL = 'users.MainUser'
 
 REST_FRAMEWORK = {
