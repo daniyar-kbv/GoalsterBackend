@@ -16,6 +16,7 @@ class ObservationInline(admin.StackedInline):
     model = Observation
     extra = 0
     fields = ['observer', 'is_confirmed']
+    autocomplete_fields = ['observer']
 
 
 @admin.register(Goal)
