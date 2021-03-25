@@ -8,13 +8,14 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_jwt.settings import api_settings
+from itertools import chain
 from users.models import MainUser, Transaction, OTP, Reaction, Profile, FollowModel
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
     ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer, UserVerifyActivationEmailSerializer, \
     RegisterSerializer, VerifyOTPSerializer, ResendOTPSerializer, FeedSerializer, ReactSerializer, \
     ProfileFullSerializer, ProfileSerializer, UpdateProfileSerializer
 from main.tasks import after_three_days, send_email
-from main.models import SelectedSphere, Observation, UserResults
+from main.models import SelectedSphere, Observation, UserResults, Goal
 from main.serializers import UserResultsSerializer
 from utils import encoding, response, permissions, emails, general, auth, time
 import constants, datetime
@@ -293,10 +294,16 @@ class FeedViewSet(viewsets.GenericViewSet,
             if type == constants.FEED_TYPE_RECOMMENDATIONS:
                 queryset = queryset.order_by('-is_special', '-created_at')
                 if not isinstance(self.request.user, AnonymousUser):
-                    queryset = queryset.filter(~Q(followers__follower=self.request.user))
+                    queryset = queryset.filter(~Q(followers__follower=self.request.user)).distinct()
+                    if self.request.user.selected.count() > 0 and \
+                        Goal.objects.filter(
+                            user=self.request.user, is_public=True, date=time.get_local_dt().date()
+                        ).count() > 0:
+                        user_queryset = MainUser.objects.filter(id=self.request.user.id)
+                        queryset = list(chain(user_queryset, queryset))
             elif type == constants.FEED_TYPE_FOLLOWING:
-                queryset = queryset.filter(followers__follower=self.request.user)
-        return queryset.distinct()
+                queryset = queryset.filter(followers__follower=self.request.user).distinct()
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
