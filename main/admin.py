@@ -2,6 +2,11 @@ from django.contrib import admin
 from main.models import Goal, Observation, Help, SelectedSphere, Comment
 
 
+@admin.register(SelectedSphere)
+class SelectedSphereAdmin(admin.ModelAdmin):
+    search_fields = ['user__email']
+
+
 class CommentInline(admin.StackedInline):
     model = Comment
     extra = 0
@@ -18,6 +23,7 @@ class GoalAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'name', 'date', 'time', 'is_done', 'is_shared')
     inlines = [ObservationInline, CommentInline]
     search_fields = ['name', 'user__email']
+    autocomplete_fields = ['user', 'sphere']
 
 
 @admin.register(Help)
