@@ -154,10 +154,10 @@ CELERY_BEAT_SCHEDULE = {
        'task': 'main.tasks.check_premium',
        'schedule': crontab(hour=0, minute=0),
     },
-    'backups': {
-        'task': 'main.tasks.backup',
-        'schedule': crontab(hour=0, minute=0, day_of_month='*/2')
-    },
+    # 'backups': {
+    #     'task': 'main.tasks.backup',
+    #     'schedule': crontab(hour=0, minute=0, day_of_month='*/2')
+    # },
     'delete_reactions': {
         'task': 'main.tasks.delete_reactions',
         'schedule': crontab(hour=12, minute=0)
