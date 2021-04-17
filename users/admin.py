@@ -15,7 +15,7 @@ class OTPInline(admin.StackedInline):
 class UserTransactionsInline(admin.StackedInline):
     model = Transaction
     extra = 0
-    readonly_fields = ['user', 'identifier', 'date', 'product_id', 'time_amount', 'time_unit']
+    # readonly_fields = ['user', 'identifier', 'date', 'product_id', 'time_amount', 'time_unit']
 
 
 class UserResultsInline(admin.StackedInline):
