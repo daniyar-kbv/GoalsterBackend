@@ -127,9 +127,9 @@ def comment_saved(sender, instance, created=True, **kwargs):
             if instance.goal.user.fcm_token:
                 notifications.send_user_notification(
                     instance.goal.user,
-                    constants.NEW_COMMENT_EN
+                    constants.NEW_COMMENT_OBSERVER_EN
                     if instance.goal.user.language == constants.LANGUAGE_ENGLISH else
-                    constants.NEW_COMMENT_RU,
+                    constants.NEW_COMMENT_OBSERVER_RU,
                     instance.text,
                     data
                 )

@@ -140,6 +140,8 @@ END_BODY_EN = 'Click here and summarize.'
 
 NEW_COMMENT_RU = 'Новый коментарий'
 NEW_COMMENT_EN = 'New comment'
+NEW_COMMENT_OBSERVER_RU = 'Ваш наставник оставил комментарий. Скорей заходи.'
+NEW_COMMENT_OBSERVER_EN = 'Your mentor left a comment.'
 
 FIREBASE_SERVER_KEY = os.environ.get('FIREBASE_SERVER_KEY')
 
