@@ -21,6 +21,7 @@ dkimpy==1.0.5
 dnspython==1.16.0
 encrypted-credentials==0.0.2
 eventlet==0.29.1
+Faker==8.9.1
 future==0.18.2
 google-api-core==1.25.0
 google-api-python-client==1.12.8
@@ -41,6 +42,7 @@ psycopg2-binary==2.8.5
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.20
+pydkim==0.3
 PyJWT==1.7.1
 python-crontab==2.5.1
 python-dateutil==2.8.1
@@ -50,6 +52,7 @@ requests==2.24.0
 rsa==4.6
 six==1.15.0
 sqlparse==0.3.1
+text-unidecode==1.3
 uritemplate==3.0.1
 urllib3==1.25.10
 vine==1.3.0
