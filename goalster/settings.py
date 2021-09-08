@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os, datetime, sys
 from celery.schedules import crontab
+import firebase_admin
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,6 +46,8 @@ INSTALLED_APPS = [
 
     'main',
     'users',
+    'push_notifications',
+    'helper'
 ]
 
 MIDDLEWARE = [
@@ -154,13 +157,13 @@ CELERY_BEAT_SCHEDULE = {
        'task': 'main.tasks.check_premium',
        'schedule': crontab(hour=0, minute=0),
     },
-    # 'backups': {
-    #     'task': 'main.tasks.backup',
-    #     'schedule': crontab(hour=0, minute=0, day_of_month='*/2')
-    # },
     'delete_reactions': {
         'task': 'main.tasks.delete_reactions',
         'schedule': crontab(hour=12, minute=0)
+    },
+    'send_rate_notifications': {
+        'task': 'main.tasks.send_rate_notifications',
+        'schedule': crontab(hour=15, minute=0)
     }
 }
 
@@ -260,3 +263,5 @@ DBBACKUP_CONNECTORS = {
         'PORT': os.environ.get('DB_PORT', 5432),
     }
 }
+
+default_app = firebase_admin.initialize_app()

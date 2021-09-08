@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
-from django.db import models
+from django.db import models, connection
 from users.models import MainUser
-from utils import upload, validators
+from utils import upload, validators, types
 from PIL import Image, ExifTags
 import constants
 

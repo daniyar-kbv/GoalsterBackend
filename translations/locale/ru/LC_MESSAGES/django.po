@@ -20,6 +20,42 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
+msgid "Main"
+msgstr "Основоное"
+
+msgid "Push notifications"
+msgstr "Пуш уведомления"
+
+msgid "Weekday"
+msgstr "День недели"
+
+msgid "Weekdays"
+msgstr "Дни недели"
+
+msgid "Disposable notification"
+msgstr "Одноразовое уведомление"
+
+msgid "Disposable notifications"
+msgstr "Одноразовые уведомления"
+
+msgid "Periodic notification"
+msgstr "Периодичное уведомление"
+
+msgid "Periodic notifications"
+msgstr "Периодичные уведомления"
+
+msgid "Non customizable notification types"
+msgstr "Не настраиваемый тип уведомления"
+
+msgid "Non customizable notification type"
+msgstr "Не настраиваемые типы уведомлений"
+
+msgid "Body"
+msgstr "Тело"
+
+msgid "Title"
+msgstr "Заголовок"
+
 msgid "Follow"
 msgstr "Подписка"
 

@@ -17,7 +17,7 @@ from users.serializers import UserSendActivationEmailSerializer, UserShortSerial
 from main.tasks import after_three_days, send_email
 from main.models import SelectedSphere, Observation, UserResults, Goal
 from main.serializers import UserResultsSerializer
-from utils import encoding, response, permissions, emails, general, auth, time
+from utils import encoding, response, permissions, emails, general, auth, time, notifications
 import constants, datetime
 
 
@@ -145,7 +145,7 @@ class UserViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def connect(self, request, pk=None):
-        user = request.user
+        user: MainUser = request.user
         user.last_activity = timezone.now()
         user.received_three_days_notification = False
         after_three_days.apply_async(args=[user.id], eta=datetime.datetime.now() + datetime.timedelta(days=3))
@@ -163,6 +163,7 @@ class UserViewSet(viewsets.GenericViewSet,
         serializer = ConnectSerializer(instance=user, data=request.data)
         if serializer.is_valid():
             serializer.save()
+            user.update_topic()
         return Response(auth.auth_user_data(user, request))
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
@@ -172,6 +173,7 @@ class UserViewSet(viewsets.GenericViewSet,
             user = request.user
             user.language = serializer.validated_data.get('language')
             user.save()
+            user.update_topic()
             return Response()
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 

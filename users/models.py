@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from firebase_admin import messaging
 from PIL import Image, ExifTags
-from utils import validators, upload, emails
+from utils import validators, upload, emails, types
 import constants, random
 
 
@@ -42,6 +43,11 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
     language = models.PositiveSmallIntegerField(_('Language'), choices=constants.LANGUAGES,
                                                 default=constants.LANGUAGE_RUSSIAN, blank=True)
     fcm_token = models.CharField(_('FCM Token'), max_length=500, null=True, blank=True)
+    topic = models.CharField('Firebase topic',
+                             max_length=10,
+                             choices=constants.TOPICS,
+                             null=True,
+                             blank=True)
     notifications_enabled = models.BooleanField(_('Notifications enabled'), default=True, blank=True)
     last_activity = models.DateTimeField(_('Last activity'), null=True, blank=True)
     received_three_days_notification = models.BooleanField(
@@ -70,6 +76,16 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'{self.id}: {self.email}'
+
+    def update_topic(self):
+        topic = types.get_type_value(constants.LANGUAGES_TOPICS, self.language)
+        messaging.subscribe_to_topic([self.fcm_token], topic)
+
+        if self.topic and self.topic != topic:
+            messaging.unsubscribe_from_topic([self.fcm_token], self.topic)
+
+        self.topic = topic
+        self.save()
 
 
 class FollowModel(models.Model):

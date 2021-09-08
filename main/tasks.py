@@ -1,15 +1,14 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
-from django.core.management import call_command
+from typing import List
 from django.core.mail import EmailMessage
 from django.utils import timezone
-from django.conf import settings
 from users.models import MainUser, Transaction, OTP, Reaction
 from main.models import SelectedSphere, UserAnswer, UserResults, Goal
-from utils.notifications import send_notification, get_topic_text
+from utils.notifications import send_notification
 from dateutil.relativedelta import relativedelta
 import os
-import logging, constants, datetime, requests
+import logging, constants, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -106,18 +105,6 @@ def check_premium():
 
 
 @shared_task
-def backup():
-    call_command('dbbackup', '-c')
-    call_command('mediabackup', '-c')
-    os.system(f'cd backups && \
-              git config --global user.email "{os.environ.get("GITHUB_EMAIL")}" && \
-              git config --global user.name "{os.environ.get("GITHUB_USERNAME")}" && \
-              git add . && \
-              git commit -m "backup" && \
-              git push https://{os.environ.get("GITHUB_USERNAME")}:{os.environ.get("GITHUB_PASSWORD")}@github.com/goalster/{os.environ.get("GITHUB_REPOSITORY")}.git --all')
-
-
-@shared_task
 def delete_otp(id):
     try:
         otp = OTP.objects.get(id=id)
@@ -131,3 +118,11 @@ def delete_reactions():
     week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
     reactions = Reaction.objects.filter(created_at__lte=week_ago)
     reactions.delete()
+
+
+@shared_task
+def send_rate_notifications():
+    all_users: List[MainUser] = MainUser.objects.all()
+    for user in all_users:
+        if (datetime.datetime.now() - user.created_at).days > 3:
+            send_notification(user, constants.NOTIFICATION_RATE)

@@ -116,6 +116,36 @@ NOTIFICATION_3DAYS = 1
 NOTIFICATION_BEFORE_END = 2
 NOTIFICATION_END = 3
 NOTIFICATION_COMMENT = 4
+NOTIFICATION_COMMENT_OBSERVER = 5
+NOTIFICATION_RATE = 6
+NOTIFICATION_COMPLETE_GOALS = 7
+
+THREE_DAYS_TITLE_RU = 'Ты 3 дня не заходил в приложение 24Goals.'
+THREE_DAYS_BODY_RU = 'Кликни сюда и я покажу тебе то, для чего ты все начал.'
+BEFORE_END_TITLE_RU = 'Скоро подведение итогов!'
+BEFORE_END_BODY_RU = 'Ты готов?'
+END_TITLE_RU = '30 дневный период подходит к концу уже сегодня!'
+END_BODY_RU = 'Кликни сюда и подведи итоги.'
+RATE_TITLE_RU = 'Оцени приложение'
+RATE_BODY_RU = ''
+COMPLETE_GOALS_TITLE_RU = 'Ты не завершил цели на сегодня'
+COMPLETE_GOALS_BODY_RU = 'Вернись и заверши!'
+
+THREE_DAYS_TITLE_EN = "You haven't opened the 24Goals app in 3 days."
+THREE_DAYS_BODY_EN = "Click here and I'll show you what you started it all for."
+BEFORE_END_TITLE_EN = 'Summing up soon!'
+BEFORE_END_BODY_EN = 'Are you ready?'
+END_TITLE_EN = 'The 30-day period is coming to an end today!'
+END_BODY_EN = 'Click here and summarize.'
+RATE_TITLE_EN = 'Rate our app'
+RATE_BODY_EN = ''
+COMPLETE_GOALS_TITLE_EN = 'You have not completed tour goals'
+COMPLETE_GOALS_BODY_EN = 'Come back and complete!'
+
+NEW_COMMENT_RU = 'Новый коментарий'
+NEW_COMMENT_EN = 'New comment'
+NEW_COMMENT_OBSERVER_RU = 'Ваш наставник оставил комментарий. Скорей заходи.'
+NEW_COMMENT_OBSERVER_EN = 'Your mentor left a comment.'
 
 NOTIFICATION_TYPES = (
     (NOTIFICATION_3DAYS, '3 inactive days'),
@@ -124,24 +154,55 @@ NOTIFICATION_TYPES = (
     (NOTIFICATION_COMMENT, 'New comment')
 )
 
-THREE_DAYS_TITLE_RU = 'Ты 3 дня не заходил в приложение 24Goals.'
-THREE_DAYS_BODY_RU = 'Кликни сюда и я покажу тебе то, для чего ты все начал.'
-BEFORE_END_TITLE_RU = 'Скоро подведение итогов!'
-BEFORE_END_BODY_RU = 'Ты готов?'
-END_TITLE_RU = '30 дневный период подходит к концу уже сегодня!'
-END_BODY_RU = 'Кликни сюда и подведи итоги.'
+NON_CUSTOMIZABLE_NOTIFICATION_TYPES = (
+    (NOTIFICATION_END, 'Об окончании периода'),
+    (NOTIFICATION_BEFORE_END, 'За 3 дня до окончания периода'),
+    (NOTIFICATION_COMMENT, 'Комментарий наставнику'),
+    (NOTIFICATION_COMMENT_OBSERVER, 'Комментарий наблюдателю'),
+    (NOTIFICATION_3DAYS, 'Если пользователь не заходит 3 дня'),
+    (NOTIFICATION_RATE, 'Оцени приложение'),
+    (NOTIFICATION_COMPLETE_GOALS, 'Для завершения целей')
+)
 
-THREE_DAYS_TITLE_EN = "You haven't opened the 24Goals app in 3 days."
-THREE_DAYS_BODY_EN = "Click here and I'll show you what you started it all for."
-BEFORE_END_TITLE_EN = 'Summing up soon!'
-BEFORE_END_BODY_EN = 'Are you ready?'
-END_TITLE_EN = 'The 30-day period is coming to an end today!'
-END_BODY_EN = 'Click here and summarize.'
+NON_CUSTOMIZABLE_NOTIFICATION_TITLES_EN = (
+    (NOTIFICATION_END, END_TITLE_EN),
+    (NOTIFICATION_BEFORE_END, BEFORE_END_TITLE_EN),
+    (NOTIFICATION_COMMENT, NEW_COMMENT_EN),
+    (NOTIFICATION_COMMENT_OBSERVER, NEW_COMMENT_OBSERVER_EN),
+    (NOTIFICATION_3DAYS, THREE_DAYS_TITLE_EN),
+    (NOTIFICATION_RATE, RATE_TITLE_EN),
+    (NOTIFICATION_COMPLETE_GOALS, COMPLETE_GOALS_TITLE_EN),
+)
 
-NEW_COMMENT_RU = 'Новый коментарий'
-NEW_COMMENT_EN = 'New comment'
-NEW_COMMENT_OBSERVER_RU = 'Ваш наставник оставил комментарий. Скорей заходи.'
-NEW_COMMENT_OBSERVER_EN = 'Your mentor left a comment.'
+NON_CUSTOMIZABLE_NOTIFICATION_TITLES_RU = (
+    (NOTIFICATION_END, END_TITLE_RU),
+    (NOTIFICATION_BEFORE_END, BEFORE_END_TITLE_RU),
+    (NOTIFICATION_COMMENT, NEW_COMMENT_RU),
+    (NOTIFICATION_COMMENT_OBSERVER, NEW_COMMENT_OBSERVER_RU),
+    (NOTIFICATION_3DAYS, THREE_DAYS_TITLE_RU),
+    (NOTIFICATION_RATE, RATE_TITLE_RU),
+    (NOTIFICATION_COMPLETE_GOALS, COMPLETE_GOALS_TITLE_RU),
+)
+
+NON_CUSTOMIZABLE_NOTIFICATION_BODIES_EN = (
+    (NOTIFICATION_END, END_BODY_EN),
+    (NOTIFICATION_BEFORE_END, BEFORE_END_BODY_EN),
+    (NOTIFICATION_COMMENT, None),
+    (NOTIFICATION_COMMENT_OBSERVER, None),
+    (NOTIFICATION_3DAYS, THREE_DAYS_BODY_EN),
+    (NOTIFICATION_RATE, RATE_BODY_EN),
+    (NOTIFICATION_COMPLETE_GOALS, COMPLETE_GOALS_BODY_EN),
+)
+
+NON_CUSTOMIZABLE_NOTIFICATION_BODIES_RU = (
+    (NOTIFICATION_END, END_BODY_RU),
+    (NOTIFICATION_BEFORE_END, BEFORE_END_BODY_RU),
+    (NOTIFICATION_COMMENT, None),
+    (NOTIFICATION_COMMENT_OBSERVER, None),
+    (NOTIFICATION_3DAYS, THREE_DAYS_BODY_RU),
+    (NOTIFICATION_RATE, RATE_BODY_RU),
+    (NOTIFICATION_COMPLETE_GOALS, COMPLETE_GOALS_BODY_RU),
+)
 
 FIREBASE_SERVER_KEY = os.environ.get('FIREBASE_SERVER_KEY')
 
@@ -217,3 +278,34 @@ EMAIL_PURCHASE_BODY_5_RU = "Ссылка на скачивание матери�
 
 EMAIL_PURCHASE_LINK_EN = "https://drive.google.com/file/d/1376sapAOrObcBNwp_4iYcXjs6HXO0jX1/view?usp=sharing"
 EMAIL_PURCHASE_LINK_RU = "https://drive.google.com/file/d/1xr5NJBsBXhhl6G4G9JjbKThSW5DyxFj2/view?usp=sharing"
+
+WEEKDAY_MONDAY = 0
+WEEKDAY_TUESDAY = 1
+WEEKDAY_WEDNESDAY = 2
+WEEKDAY_THURSDAY = 3
+WEEKDAY_FRIDAY = 4
+WEEKDAY_SATURDAY = 5
+WEEKDAY_SUNDAY = 6
+
+WEEKDAYS = [
+    (WEEKDAY_MONDAY, 'Monday'),
+    (WEEKDAY_TUESDAY, 'Tuesday'),
+    (WEEKDAY_WEDNESDAY, 'Wednesday'),
+    (WEEKDAY_THURSDAY, 'Thursday'),
+    (WEEKDAY_FRIDAY, 'Friday'),
+    (WEEKDAY_SATURDAY, 'Saturday'),
+    (WEEKDAY_SUNDAY, 'Sunday'),
+]
+
+TOPIC_RU = '1'
+TOPIC_EN = '2'
+
+TOPICS = [
+    (TOPIC_RU, 'RU'),
+    (TOPIC_EN, 'EN')
+]
+
+LANGUAGES_TOPICS = [
+    (LANGUAGE_RUSSIAN, TOPIC_RU),
+    (LANGUAGE_ENGLISH, TOPIC_EN)
+]

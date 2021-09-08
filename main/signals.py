@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from main.models import SelectedSphere, Observation, UserAnswer, Visualization, Help, Comment
+from push_notifications.models import NonCustomizableNotificationType
 from main.tasks import send_email, delete_emoton
 from utils import emails, upload, time, notifications
 from dateutil.relativedelta import relativedelta
@@ -114,22 +115,34 @@ def comment_saved(sender, instance, created=True, **kwargs):
                 observation = Observation.objects.get(goal=instance.goal)
             except:
                 return
+            try:
+                notification_type: NonCustomizableNotificationType = NonCustomizableNotificationType.objects.get(
+                    type=constants.NOTIFICATION_COMMENT
+                )
+            except:
+                return
             if observation.observer.fcm_token:
                 notifications.send_user_notification(
                     observation.observer,
-                    constants.NEW_COMMENT_EN
+                    notification_type.title_en
                     if observation.observer.language == constants.LANGUAGE_ENGLISH else
-                    constants.NEW_COMMENT_RU,
+                    notification_type.title_ru,
                     instance.text,
                     data
                 )
         else:
+            try:
+                notification_type: NonCustomizableNotificationType = NonCustomizableNotificationType.objects.get(
+                    type=constants.NOTIFICATION_COMMENT_OBSERVER
+                )
+            except:
+                return
             if instance.goal.user.fcm_token:
                 notifications.send_user_notification(
                     instance.goal.user,
-                    constants.NEW_COMMENT_OBSERVER_EN
+                    notification_type.title_en
                     if instance.goal.user.language == constants.LANGUAGE_ENGLISH else
-                    constants.NEW_COMMENT_OBSERVER_RU,
+                    notification_type.title_ru,
                     instance.text,
                     data
                 )

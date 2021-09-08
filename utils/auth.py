@@ -8,7 +8,9 @@ from main.models import SelectedSphere, Observation
 from main.tasks import send_email
 from users.models import Transaction, MainUser, Profile
 from users.serializers import UserSendActivationEmailSerializer, ProfileSerializer
-from utils import general, response, emails
+from push_notifications.models import PeriodicNotification, NonCustomizableNotificationType
+from push_notifications.serializers import PeriodicNotificationSerializer, NonCustomizableNotificationTypeSerializer
+from utils import response, emails, types
 import constants, datetime
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -24,7 +26,7 @@ def auth_user_data(user, request):
     premium_end_date = None
     if last_transaction:
         premium_type = f'{last_transaction.time_amount} ' \
-                       f'{general.get_type_name(constants.TIME_FRAMES, last_transaction.time_unit)}' \
+                       f'{types.get_type_value(constants.TIME_FRAMES, last_transaction.time_unit)}' \
                        f'{_("s") if last_transaction.time_amount > 1 else ""}'
         premium_end_date = (
             last_transaction.created_at + (
@@ -46,6 +48,13 @@ def auth_user_data(user, request):
         }).data \
         if Profile.objects.filter(user=user).exists() \
         else None
+    periodic_notifications = PeriodicNotification.objects.all()
+    periodic_notifications_data = PeriodicNotificationSerializer(periodic_notifications, many=True).data
+    non_customizable_notifications = NonCustomizableNotificationType.objects.filter(
+        type__in=[constants.NOTIFICATION_3DAYS, constants.NOTIFICATION_COMPLETE_GOALS]
+    )
+    non_customizable_notifications_data = NonCustomizableNotificationTypeSerializer(non_customizable_notifications,
+                                                                                    many=True).data
     return {
         'token': token,
         'hasSpheres': SelectedSphere.objects.filter(user=user).count() == 3,
@@ -57,7 +66,9 @@ def auth_user_data(user, request):
         'premiumEndDate': premium_end_date,
         'notConfirmedCount': Observation.objects.filter(Q(observer=user) & Q(is_confirmed=None)).distinct(
             'observer').count(),
-        'showResults': user.show_results
+        'showResults': user.show_results,
+        'periodic_notifications': periodic_notifications_data,
+        'non_customizable_notifications': non_customizable_notifications_data
     }
 
 

@@ -1,5 +1,8 @@
 from django.contrib import admin
+from django.db import models
+from django.forms import TextInput
 from main.models import Goal, Observation, Help, SelectedSphere, Comment
+import constants
 
 
 @admin.register(SelectedSphere)

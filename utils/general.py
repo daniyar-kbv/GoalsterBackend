@@ -5,13 +5,6 @@ from main.serializers import GoalAddSerializer, GoalListSerializer
 
 from . import response
 
-
-def get_type_name(types, number):
-    for type in types:
-        if type[0] == number:
-            return type[1]
-
-
 def add_goal(request):
     context = {
         'user': request.user,

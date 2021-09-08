@@ -1,13 +1,14 @@
+from typing import Optional, List
+from push_notifications.models import NonCustomizableNotificationType
 import requests, constants
-
-from users.models import MainUser
 
 
 def send_notification(user, type):
-    parameters = { 
+    texts = get_texts(type, user.language)
+    parameters = {
         'notification': {
-            'title': get_texts(type, user.language)[0],
-            'body': get_texts(type, user.language)[1],
+            'title': texts[0],
+            'body': texts[1],
             'sound': 'default',
             'badge': 1
         },
@@ -39,22 +40,17 @@ def send_user_notification(user, title, body, data):
     requests.request(method='POST', url=constants.FCM_SEND_URL, json=parameters, headers=headers)
 
 
-def get_texts(type, language):
-    if type == constants.NOTIFICATION_3DAYS:
-        if language == constants.LANGUAGE_RUSSIAN:
-            return constants.THREE_DAYS_TITLE_RU, constants.THREE_DAYS_BODY_RU
-        else:
-            return constants.THREE_DAYS_TITLE_EN, constants.THREE_DAYS_BODY_EN
-    elif type == constants.NOTIFICATION_BEFORE_END:
-        if language == constants.LANGUAGE_RUSSIAN:
-            return constants.BEFORE_END_TITLE_RU, constants.BEFORE_END_BODY_RU
-        else:
-            return constants.BEFORE_END_TITLE_EN, constants.BEFORE_END_BODY_EN
-    elif type == constants.NOTIFICATION_END:
-        if language == constants.LANGUAGE_RUSSIAN:
-            return constants.END_TITLE_RU, constants.END_BODY_RU
-        else:
-            return constants.END_TITLE_EN, constants.END_BODY_EN
+def get_texts(type, language) -> (Optional[List[str]]):
+    try:
+        notification_type: NonCustomizableNotificationType = NonCustomizableNotificationType.objects.get(
+            type=type
+        )
+    except:
+        return None
+    if language == constants.LANGUAGE_RUSSIAN:
+        return notification_type.title_ru, notification_type.body_ru
+    else:
+        return notification_type.title_en, notification_type.body_en
 
 
 def get_topic_text(topic, language):
