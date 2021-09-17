@@ -9,6 +9,10 @@ def avatar_document_path(instance, filename):
     return f'avatars/{filename}'
 
 
+def celebrity_avatar_document_path(instance, filename):
+    return f'celebrity_avatars/{filename}'
+
+
 def delete_folder(document):
     path = os.path.abspath(os.path.join(document.path, '..'))
     if os.path.isdir(path):

@@ -124,5 +124,5 @@ def delete_reactions():
 def send_rate_notifications():
     all_users: List[MainUser] = MainUser.objects.all()
     for user in all_users:
-        if (datetime.datetime.now() - user.created_at).days > 3:
+        if (timezone.now() - user.created_at).days > 3:
             send_notification(user, constants.NOTIFICATION_RATE)

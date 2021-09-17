@@ -150,10 +150,11 @@ class FeedSerializer(serializers.ModelSerializer):
     profile = ProfileFeedSerialzier()
     selected = SelectedSpheresFullSerializer(many=True)
     reactions = serializers.SerializerMethodField()
+    is_celebrity = serializers.SerializerMethodField()
 
     class Meta:
         model = MainUser
-        fields = ['id', 'profile', 'selected', 'reactions']
+        fields = ['id', 'profile', 'selected', 'reactions', 'is_celebrity']
 
     def get_reactions(self, obj):
         return map(
@@ -167,6 +168,9 @@ class FeedSerializer(serializers.ModelSerializer):
             },
             ReactionType.objects.all()
         )
+
+    def get_is_celebrity(self, obj):
+        return False
 
 
 class ProfileGoalsSerializer(serializers.ModelSerializer):

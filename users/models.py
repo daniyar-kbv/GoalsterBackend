@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 from firebase_admin import messaging
 from PIL import Image, ExifTags
 from utils import validators, upload, emails, types
@@ -39,6 +41,7 @@ class MainUserManager(BaseUserManager):
 class MainUser(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(_('Email'), unique=True)
+    password = models.CharField(_('password'), max_length=128, null=True, blank=True)
     created_at = models.DateTimeField(_('Registration date'), auto_now_add=True, null=False, blank=True)
     language = models.PositiveSmallIntegerField(_('Language'), choices=constants.LANGUAGES,
                                                 default=constants.LANGUAGE_RUSSIAN, blank=True)
@@ -62,6 +65,7 @@ class MainUser(AbstractBaseUser, PermissionsMixin):
     show_results = models.BooleanField(_('Show results'), default=False)
     in_recommendations = models.BooleanField(_('In recommendations'), default=True)
     is_special = models.BooleanField(_('Special'), default=False)
+    is_celebrity = models.BooleanField(_('Celebrity'), default=False)
 
     objects = MainUserManager()
 
@@ -117,6 +121,7 @@ class Profile(models.Model):
         related_name='profile',
         verbose_name=_('User')
     )
+
     name = models.CharField(_('First name'), max_length=100)
     specialization = models.CharField(_('Specialization'), max_length=100)
     instagram_username = models.CharField(_('Instagram username'), max_length=100)

@@ -2,23 +2,24 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db.models import Q, Count, Case, When
 from django.contrib.auth.models import AnonymousUser
-from django.shortcuts import redirect
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_jwt.settings import api_settings
 from itertools import chain
-from users.models import MainUser, Transaction, OTP, Reaction, Profile, FollowModel
+from users.models import MainUser, OTP, Reaction, Profile, FollowModel
 from users.serializers import UserSendActivationEmailSerializer, UserShortSerializer, ChangeLanguageSerializer, \
-    ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer, UserVerifyActivationEmailSerializer, \
-    RegisterSerializer, VerifyOTPSerializer, ResendOTPSerializer, FeedSerializer, ReactSerializer, \
-    ProfileFullSerializer, ProfileSerializer, UpdateProfileSerializer
+    ChangeNotificationsSerializer, ConnectSerializer, TransactionSerializer, RegisterSerializer, VerifyOTPSerializer, \
+    ResendOTPSerializer, FeedSerializer, ReactSerializer, ProfileFullSerializer, UpdateProfileSerializer
 from main.tasks import after_three_days, send_email
-from main.models import SelectedSphere, Observation, UserResults, Goal
+from main.models import UserResults, Goal
 from main.serializers import UserResultsSerializer
-from utils import encoding, response, permissions, emails, general, auth, time, notifications
-import constants, datetime
+from celebrities.models import Celebrity, CelebrityFollowModel, CelebrityReaction
+from celebrities.serializers import CelebrityFeedSerializer, CelebrityProfileFullSerializer
+from utils import encoding, response, permissions, emails, auth, time, feed
+import constants
+import datetime
 
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -320,38 +321,122 @@ class FeedViewSet(viewsets.GenericViewSet,
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def follow(self, request, pk=None):
-        instance = self.get_object()
-        user = request.user
-        try:
-            follow = FollowModel.objects.get(user=instance, follower=user)
-            follow.delete()
-        except:
-            FollowModel.objects.create(user=instance, follower=user)
-        context = {
-            'request': request
-        }
-        serializer = ProfileFullSerializer(instance, context=context)
-        return Response(serializer.data)
+        return feed.follow_user(self, request)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def react(self, request, pk=None):
-        serializer = ReactSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = self.get_object()
+        return feed.react_user(self, request)
+
+
+class FeedV2ViewSet(FeedViewSet):
+    def filter_celebrity_queryset(self, queryset):
+        if self.action == 'list':
+            type = self.request.query_params.get('type', constants.FEED_TYPE_RECOMMENDATIONS)
+            if type == constants.FEED_TYPE_RECOMMENDATIONS:
+                queryset = queryset.order_by('order')
+                if not isinstance(self.request.user, AnonymousUser):
+                    queryset = queryset.filter(~Q(followers__follower=self.request.user)).distinct()
+            elif type == constants.FEED_TYPE_FOLLOWING:
+                queryset = queryset.filter(followers__follower=self.request.user).distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        celebrity_queryset = self.filter_celebrity_queryset(Celebrity.objects.filter(is_active=True))
+        celebrities_data = CelebrityFeedSerializer(celebrity_queryset,
+                                                   many=True,
+                                                   context=self.get_serializer_context())\
+            .data
+
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            serializer_data = celebrities_data + serializer.data
+            return self.get_paginated_response(serializer_data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        serializer_data = celebrities_data + serializer.data
+        return Response(serializer_data)
+
+    def retrieve(self, request, *args, **kwargs):
         try:
-            reaction = Reaction.objects.get(type=serializer.reaction_type, user=user, sender=request.user,
-                                            created_at__date=time.get_local_dt().date())
-            reaction.delete()
+            instance = self.get_object(False)
+            serializer = self.get_serializer(instance)
         except:
-            reactions = Reaction.objects.filter(user=user, sender=request.user,
-                                                created_at__date=time.get_local_dt().date())
-            reactions.delete()
-            Reaction.objects.create(type=serializer.reaction_type, user=user, sender=request.user)
-        return Response({
-            'id': serializer.reaction_type.id,
-            'emoji': serializer.reaction_type.emoji,
-            'count': Reaction.objects.filter(user=user, type=serializer.reaction_type,
-                                             created_at__date=time.get_local_dt().date()).count(),
-            'reacted': Reaction.objects.filter(user=user, type=serializer.reaction_type, sender=request.user,
-                                               created_at__date=time.get_local_dt().date()).exists()
-        })
+            instance = self.get_object(True)
+            serializer = CelebrityProfileFullSerializer(instance,
+                                                        context=self.get_serializer_context())
+        return Response(serializer.data)
+
+    def get_object(self, is_celebrity: bool = False):
+        if is_celebrity:
+            queryset = Celebrity.objects.filter(is_active=True)
+        else:
+            queryset = self.filter_queryset(self.get_queryset())
+
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+
+        assert lookup_url_kwarg in self.kwargs, (
+            (self.__class__.__name__, lookup_url_kwarg)
+        )
+
+        filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
+        obj = generics.get_object_or_404(queryset, **filter_kwargs)
+
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def follow(self, request, pk=None):
+        try:
+            instance = Celebrity.objects.get(id=pk)
+            user = request.user
+            try:
+                follow = CelebrityFollowModel.objects.get(user=instance, follower=user)
+                follow.delete()
+            except:
+                CelebrityFollowModel.objects.create(user=instance, follower=user)
+            context = {
+                'request': request
+            }
+            serializer = CelebrityProfileFullSerializer(instance, context=context)
+            return Response(serializer.data)
+        except:
+            return feed.follow_user(self, request)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def react(self, request, pk=None):
+        try:
+            serializer = ReactSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = Celebrity.objects.get(id=pk)
+            try:
+                reaction = CelebrityReaction.objects.get(type=serializer.reaction_type,
+                                                         user=user,
+                                                         sender=request.user,
+                                                         created_at__date=time.get_local_dt().date())
+                reaction.delete()
+            except:
+                reactions = CelebrityReaction.objects.filter(user=user,
+                                                             sender=request.user,
+                                                             created_at__date=time.get_local_dt().date())
+                reactions.delete()
+                CelebrityReaction.objects.create(type=serializer.reaction_type, user=user, sender=request.user)
+            return Response({
+                'id': serializer.reaction_type.id,
+                'emoji': serializer.reaction_type.emoji,
+                'count': CelebrityReaction.objects.filter(user=user,
+                                                          type=serializer.reaction_type,
+                                                          created_at__date=time.get_local_dt().date()).count(),
+                'reacted': CelebrityReaction
+                .objects
+                .filter(user=user,
+                        type=serializer.reaction_type,
+                        sender=request.user,
+                        created_at__date=time.get_local_dt().date())
+                .exists()
+            })
+        except:
+            return feed.react_user(self, request)
