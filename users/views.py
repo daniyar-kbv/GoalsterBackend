@@ -352,7 +352,9 @@ class FeedV2ViewSet(FeedViewSet):
 
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            serializer_data = celebrities_data + serializer.data
+            serializer_data = serializer.data
+            if self.request.query_params.get('page') == '1':
+                serializer_data = celebrities_data + serializer_data
             return self.get_paginated_response(serializer_data)
 
         serializer = self.get_serializer(queryset, many=True)
