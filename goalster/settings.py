@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'dbbackup',
     'nested_inline',
+    'django_extensions',
 
     'main',
     'users',

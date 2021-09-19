@@ -13,7 +13,7 @@ fake = Faker(locale='ru_RU')
 @singleton
 class TestGenerator:
     def create_test_data(self, number):
-        for i in range(0, 50):
+        for i in range(0, number):
             user = self.__create_user()
             self.__create_profile(user)
             spheres = self.__create_spheres(user)
@@ -29,8 +29,8 @@ class TestGenerator:
         )
 
     def __create_profile(self, user: MainUser) -> Profile:
-        avatar_file = open(f'/test_images/avatars/{random.randint(1, 12)}.jpg')
-        avatar = File(avatar_file)
+        avatar_file = open(f'./test_images/avatars/{random.randint(1, 12)}.jpg', 'rb')
+        avatar = File(avatar_file, name=f'{random.randint(1, 12)}.jpg')
 
         profile = Profile.objects.create(
             user=user,

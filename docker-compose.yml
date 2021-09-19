@@ -64,6 +64,7 @@ services:
       python manage.py runserver 0:8990"
     volumes:
       - .:/goalster
+      - test_images:/goalster/test_images
     ports:
       - "8990:8990"
     depends_on:
@@ -77,3 +78,4 @@ services:
 volumes:
   postgres_data:
   rabbit:
+  test_images:

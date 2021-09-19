@@ -67,7 +67,6 @@ class SphereViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['get'])
     def test(self, request, pk=None):
-        print(list(map(lambda num: f'{num if num > 9 else f"0{num}"}:00', range(0, 24))))
         return Response()
 
 
