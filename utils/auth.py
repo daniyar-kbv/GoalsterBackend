@@ -10,7 +10,7 @@ from users.models import Transaction, MainUser, Profile
 from users.serializers import UserSendActivationEmailSerializer, ProfileSerializer
 from push_notifications.models import PeriodicNotification, NonCustomizableNotificationType
 from push_notifications.serializers import PeriodicNotificationSerializer, NonCustomizableNotificationTypeSerializer
-from utils import response, emails, types
+from utils import response, emails, types, language
 import constants, datetime
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -84,14 +84,15 @@ def send_verification_email(request, version):
                 })
             return Response(auth_user_data(user, request))
         else:
-            if request.headers.get('Accept-Language') == 'ru-ru':
+            request_language = language.get_request_language(request)
+            if request_language == constants.LANGUAGE_RUSSIAN:
                 subject = constants.ACTIVATION_EMAIL_SUBJECT_RU
             else:
                 subject = constants.ACTIVATION_EMAIL_SUBJECT_EN
             send_email.delay(subject,
                              emails.generate_activation_email(
                                  serializer.validated_data.get('email'),
-                                 request.headers.get('Accept-Language'),
+                                 request_language,
                                  version
                              ),
                              serializer.validated_data.get('email'))

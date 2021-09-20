@@ -17,7 +17,7 @@ from main.models import UserResults, Goal
 from main.serializers import UserResultsSerializer
 from celebrities.models import Celebrity, CelebrityFollowModel, CelebrityReaction
 from celebrities.serializers import CelebrityFeedSerializer, CelebrityProfileFullSerializer
-from utils import encoding, response, permissions, emails, auth, time, feed
+from utils import encoding, response, permissions, emails, auth, time, feed, language
 import constants
 import datetime
 
@@ -116,7 +116,7 @@ class UserViewSet(viewsets.GenericViewSet,
             except:
                 return Response(response.make_messages([_("User with such email doesn't exist")]),
                                 status.HTTP_404_NOT_FOUND)
-            OTP.generate(user, request.headers.get('Accept-Language'), request)
+            OTP.generate(user, language.get_request_language(request), request)
             return Response(serializer.data)
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
 
@@ -210,7 +210,8 @@ class UserViewSet(viewsets.GenericViewSet,
         if serializer.is_valid():
             serializer.save(user=request.user)
             files = []
-            if request.headers.get('Accept-Language') == 'ru-ru':
+            request_language = language.get_request_language(request)
+            if request_language == constants.LANGUAGE_RUSSIAN:
                 files.append('documents/visualization_board_ru.pdf')
                 files.append('documents/to-do_list_ru.pdf')
                 subject = constants.PREMIUM_EMAIL_SUBJECT_RU
@@ -219,7 +220,7 @@ class UserViewSet(viewsets.GenericViewSet,
                 files.append('documents/to-do_list_en.pdf')
                 subject = constants.PREMIUM_EMAIL_SUBJECT_EN
             send_email.delay(subject,
-                             emails.generate_premium_email(request.headers.get('Accept-Language')),
+                             emails.generate_premium_email(request_language),
                              request.user.email,
                              files)
             return Response()
@@ -230,12 +231,13 @@ class UserViewSet(viewsets.GenericViewSet,
         serializer = TransactionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
-            if request.headers.get('Accept-Language') == 'ru-ru':
+            request_language = language.get_request_language(request)
+            if request_language == constants.LANGUAGE_RUSSIAN:
                 subject = constants.PREMIUM_EMAIL_SUBJECT_RU
             else:
                 subject = constants.PREMIUM_EMAIL_SUBJECT_EN
             send_email.delay(subject,
-                             emails.generate_premium_email_v2(request, request.headers.get('Accept-Language')),
+                             emails.generate_premium_email_v2(request, request_language),
                              request.user.email,
                              html=True)
             return Response()

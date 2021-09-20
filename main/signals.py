@@ -46,7 +46,7 @@ def observation_saved(sender, instance, created=True, **kwargs):
                     if version < 5:
                         body = emails.generate_observation_confirmation_email(
                             instance.observer.email,
-                            'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us',
+                            instance.observer.language,
                             version
                         )
                         send_email.delay(subject,
@@ -57,7 +57,7 @@ def observation_saved(sender, instance, created=True, **kwargs):
                             subject,
                             emails.generate_observation_confirmation_email_v2(
                                 instance._request,
-                                'ru-ru' if instance.observer.language == constants.LANGUAGE_RUSSIAN else 'en-us'
+                                instance.observer.language
                             ),
                             instance.observer.email,
                             html=True

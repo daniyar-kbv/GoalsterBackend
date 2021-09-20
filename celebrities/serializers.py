@@ -2,20 +2,34 @@ from rest_framework import serializers
 from django.contrib.auth.models import AnonymousUser
 from users.models import ReactionType
 from celebrities.models import Celebrity, CelebrityProfile, CelebritySphere, CelebrityReaction, CelebrityGoal
-from utils import time
+from utils import time, language
 import constants
 
 
 class CelebritySpheresFullSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
     class Meta:
         model = CelebritySphere
         fields = ['id', 'name']
 
+    def get_name(self, obj: CelebritySphere):
+        return obj.get_name(language.get_request_language(self.context.get('request')))
+
 
 class CelebrityProfileFeedSerialzier(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    specialization = serializers.SerializerMethodField()
+
     class Meta:
         model = CelebrityProfile
-        exclude = ['user']
+        fields = ['id', 'name', 'specialization', 'instagram_username', 'avatar']
+
+    def get_name(self, obj: CelebrityProfile):
+        return obj.get_name(language.get_request_language(self.context.get('request')))
+
+    def get_specialization(self, obj: CelebrityProfile):
+        return obj.get_specialization(language.get_request_language(self.context.get('request')))
 
 
 class CelebrityFeedSerializer(serializers.ModelSerializer):
@@ -59,10 +73,14 @@ class CelebrityFeedSerializer(serializers.ModelSerializer):
 
 class CelebrityProfileGoalsSerializer(serializers.ModelSerializer):
     sphere = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
     class Meta:
         model = CelebrityGoal
         fields = ('id', 'name', 'time', 'sphere')
+
+    def get_name(self, obj: CelebrityGoal):
+        return obj.get_name(language.get_request_language(self.context.get('request')))
 
     def get_sphere(self, obj):
         for index, sphere in enumerate(CelebritySphere.objects.filter(user=self.context.get('user'))):
