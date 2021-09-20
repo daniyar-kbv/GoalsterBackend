@@ -8,14 +8,15 @@ import constants
 
 class Celebrity(models.Model):
     is_active = models.BooleanField(_('Is active'), default=False)
-    order = models.PositiveSmallIntegerField(_('Order'), default=0)
+    order = models.PositiveIntegerField(_('Order'), default=0, blank=False, null=False)
 
     class Meta:
+        ordering = ['order']
         verbose_name = _('Celebrity')
         verbose_name_plural = _('Celebrities')
 
     def __str__(self):
-        return f'Celebrity ({self.id}): {self.profile.name}'
+        return self.profile.name_en
 
 
 class CelebrityProfile(models.Model):
@@ -26,8 +27,10 @@ class CelebrityProfile(models.Model):
         verbose_name=_('User')
     )
 
-    name = models.CharField(_('First name'), max_length=100)
-    specialization = models.CharField(_('Specialization'), max_length=100)
+    name_en = models.CharField(f"{_('First name')} EN", max_length=100)
+    name_ru = models.CharField(f"{_('First name')} RU", max_length=100)
+    specialization_en = models.CharField(f"{_('Specialization')} EN", max_length=100)
+    specialization_ru = models.CharField(f"{_('Specialization')} RU", max_length=100)
     instagram_username = models.CharField(_('Instagram username'), max_length=100)
     avatar = models.FileField(
         _('Image'),
@@ -43,10 +46,12 @@ class CelebrityProfile(models.Model):
         return f'{self.id} {self.user}'
 
     def save(self, *args, **kwargs):
+        update_image = False
         try:
             this = CelebrityProfile.objects.get(id=self.id)
-            if this.avatar != self.avatar:
-                this.avatar.delete()
+            update_image = this.avatar != self.avatar
+            if update_image:
+                upload.delete_file(this.avatar)
         except:
             pass
 
@@ -60,23 +65,36 @@ class CelebrityProfile(models.Model):
 
         super(CelebrityProfile, self).save(*args, **kwargs)
 
-        image = Image.open(self.avatar.path)
+        if update_image:
+            image = Image.open(self.avatar.path)
 
-        for orientation in ExifTags.TAGS.keys():
-            if ExifTags.TAGS[orientation] == 'Orientation':
-                break
+            for orientation in ExifTags.TAGS.keys():
+                if ExifTags.TAGS[orientation] == 'Orientation':
+                    break
 
-        if image._getexif():
-            exif = dict(image._getexif().items())
+            if image._getexif():
+                exif = dict(image._getexif().items())
 
-            if exif.get(orientation) == 3:
-                image = image.rotate(180, expand=True)
-            elif exif.get(orientation) == 6:
-                image = image.rotate(270, expand=True)
-            elif exif.get(orientation) == 8:
-                image = image.rotate(90, expand=True)
+                if exif.get(orientation) == 3:
+                    image = image.rotate(180, expand=True)
+                elif exif.get(orientation) == 6:
+                    image = image.rotate(270, expand=True)
+                elif exif.get(orientation) == 8:
+                    image = image.rotate(90, expand=True)
 
-        image.save(self.avatar.path, quality=20, optimize=True)
+            image.save(self.avatar.path, quality=40, optimize=True)
+
+    def get_name(self, language):
+        if language == constants.LANGUAGE_ENGLISH:
+            return self.name_en
+        elif language == constants.LANGUAGE_RUSSIAN:
+            return self.name_ru
+
+    def get_specialization(self, language):
+        if language == constants.LANGUAGE_ENGLISH:
+            return self.specialization_en
+        elif language == constants.LANGUAGE_RUSSIAN:
+            return self.specialization_ru
 
 
 class CelebrityFollowModel(models.Model):
@@ -98,7 +116,7 @@ class CelebrityFollowModel(models.Model):
         verbose_name_plural = _('Follows')
 
     def __str__(self):
-        return f'({self.id}) {self.user.name} <- {self.follower.email}'
+        return f'({self.id}) {self.user.profile.name_en} <- {self.follower.email}'
 
 
 class CelebrityReaction(models.Model):
@@ -131,20 +149,29 @@ class CelebrityReaction(models.Model):
 
 
 class CelebritySphere(models.Model):
-    name = models.CharField(_('Name'), max_length=100)
+    name_en = models.CharField(f"{_('Name')} EN", max_length=100)
+    name_ru = models.CharField(f"{_('Name')} RU", max_length=100)
     user = models.ForeignKey(
         Celebrity,
         on_delete=models.CASCADE,
         related_name='selected',
         verbose_name=_('User')
     )
+    order = models.PositiveIntegerField(_('Order'), default=0, blank=False, null=False)
 
     class Meta:
+        ordering = ['order']
         verbose_name = _('Selected sphere')
         verbose_name_plural = _('Selected spheres')
 
     def __str__(self):
-        return f'{self.id}: {self.user}, {self.name}'
+        return f'{self.user}: {self.name_en}'
+
+    def get_name(self, language):
+        if language == constants.LANGUAGE_ENGLISH:
+            return self.name_en
+        elif language == constants.LANGUAGE_RUSSIAN:
+            return self.name_ru
 
 
 class CelebrityGoal(models.Model):
@@ -153,15 +180,23 @@ class CelebrityGoal(models.Model):
                                related_name='goals',
                                verbose_name=_('Sphere'))
 
-    name = models.TextField(_('Name'))
+    name_en = models.TextField(f"{_('Name')} EN")
+    name_ru = models.TextField(f"{_('Name')} RU")
     time = models.PositiveSmallIntegerField(_('Time of the day'),
                                             choices=constants.TIME_TYPES,
                                             default=constants.TIME_MORNING)
-    order = models.PositiveSmallIntegerField(_('Order'), default=0)
+    order = models.PositiveIntegerField(_('Order'), default=0, blank=False, null=False)
 
     class Meta:
+        ordering = ['order']
         verbose_name = _('Goal')
         verbose_name_plural = _('Goals')
 
     def __str__(self):
-        return f'{self.id}: {self.name}'
+        return f'{self.id}: {self.name_en}'
+
+    def get_name(self, language):
+        if language == constants.LANGUAGE_ENGLISH:
+            return self.name_en
+        elif language == constants.LANGUAGE_RUSSIAN:
+            return self.name_ru

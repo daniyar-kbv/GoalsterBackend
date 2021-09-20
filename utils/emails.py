@@ -6,7 +6,7 @@ import constants
 
 
 def generate_activation_email(email, language, version):
-    if language == 'ru-ru':
+    if language == constants.LANGUAGE_RUSSIAN:
         start = constants.ACTIVATION_EMAIL_BODY_START_RU
         end = constants.ACTIVATION_EMAIL_BODY_END_RU
     else:
@@ -28,7 +28,7 @@ def generate_activation_email(email, language, version):
 
 
 def generate_activation_email_v2(request, language, otp):
-    if language == 'ru-ru':
+    if language == constants.LANGUAGE_RUSSIAN:
         email_top = constants.EMAIL_TOP_RU
         bottom_1 = constants.EMAIL_BOTTOM_1_RU
         bottom_2 = constants.EMAIL_BOTTOM_2_RU
@@ -54,7 +54,7 @@ def generate_activation_email_v2(request, language, otp):
 
 
 def generate_premium_email(language):
-    if language == 'ru-ru':
+    if language == constants.LANGUAGE_RUSSIAN:
         body = constants.PREMIUM_EMAIL_BODY_RU
     else:
         body = constants.PREMIUM_EMAIL_BODY_EN
@@ -63,7 +63,7 @@ def generate_premium_email(language):
 
 
 def generate_premium_email_v2(request, language):
-    if language == 'ru-ru':
+    if language == constants.LANGUAGE_RUSSIAN:
         email_top = constants.EMAIL_TOP_RU
         bottom_1 = constants.EMAIL_BOTTOM_1_RU
         bottom_2 = constants.EMAIL_BOTTOM_2_RU
@@ -100,7 +100,7 @@ def generate_premium_email_v2(request, language):
 
 
 def generate_observation_confirmation_email(email, language, version):
-    if language == 'ru-ru':
+    if language == constants.LANGUAGE_RUSSIAN:
         start = constants.OBSERVATION_EMAIL_BODY_START_RU
         end = constants.OBSERVATION_EMAIL_BODY_END_RU
     else:
@@ -122,7 +122,7 @@ def generate_observation_confirmation_email(email, language, version):
 
 
 def generate_observation_confirmation_email_v2(request, language):
-    if language == 'ru-ru':
+    if language == constants.LANGUAGE_RUSSIAN:
         email_top = constants.EMAIL_TOP_RU
         bottom_1 = constants.EMAIL_BOTTOM_1_RU
         bottom_2 = constants.EMAIL_BOTTOM_2_RU

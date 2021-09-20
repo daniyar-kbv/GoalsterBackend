@@ -43,14 +43,15 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_beat',
     'dbbackup',
-    'nested_inline',
     'django_extensions',
+    'adminsortable2',
 
     'main',
     'users',
     'push_notifications',
     'helper',
     'celebrities',
+    'knowledge',
 ]
 
 MIDDLEWARE = [

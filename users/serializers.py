@@ -3,7 +3,7 @@ from django.contrib.auth.models import AnonymousUser
 from rest_framework import serializers
 from main.models import SelectedSphere, Goal, Observation, Comment
 from users.models import MainUser, Transaction, Profile, OTP, ReactionType, Reaction
-from utils import response, time
+from utils import response, time, language
 import constants, datetime
 
 
@@ -95,7 +95,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile')
         user = MainUser.objects.create(**validated_data)
         Profile.objects.create(**profile_data, user=user)
-        OTP.generate(user, self.context.get('request').headers.get('Accept-Language'), self.context.get('request'))
+        OTP.generate(user, language.get_request_language(self.context.get('request')), self.context.get('request'))
         return user
 
     def update(self, instance, validated_data):
@@ -108,7 +108,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         profile.save()
         instance.email = validated_data.get('email', instance.email)
         instance.save()
-        OTP.generate(instance, self.context.get('request').headers.get('Accept-Language'), self.context.get('request'))
+        OTP.generate(instance, language.get_request_language(self.context.get('request')), self.context.get('request'))
         return instance
 
 
