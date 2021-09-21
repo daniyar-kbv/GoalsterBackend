@@ -50,8 +50,6 @@ class Section(models.Model):
 
 
 class Story(models.Model):
-    title_en = models.CharField(f"{_('Title')} EN", max_length=100)
-    title_ru = models.CharField(f"{_('Title')} RU", max_length=100)
     text_en = models.TextField(f"{_('Text')} EN")
     text_ru = models.TextField(f"{_('Text')} RU")
     image = models.ImageField(
