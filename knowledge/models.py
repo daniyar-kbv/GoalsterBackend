@@ -74,7 +74,8 @@ class Story(models.Model):
         verbose_name_plural = _('Stories')
 
     def __str__(self):
-        return f'{self.section}: {self.title_en}'
+        is_long = len(self.text_en) > 70
+        return f'{self.section}: {self.text_en[:70]}{"..." if is_long else ""}'
 
     def save(self, *args, **kwargs):
         try:
