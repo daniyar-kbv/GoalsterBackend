@@ -6,8 +6,8 @@ from knowledge.models import Section, Story
 class StoryInline(SortableInlineAdminMixin, admin.TabularInline):
     model = Story
     extra = 0
-    fields = ['title_en']
-    readonly_fields = ['title_en']
+    fields = ['text_en']
+    readonly_fields = ['text_en']
     show_change_link = True
 
 
