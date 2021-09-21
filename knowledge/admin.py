@@ -11,6 +11,8 @@ class StoryInline(SortableInlineAdminMixin, admin.TabularInline):
     show_change_link = True
 
 
+
+
 @admin.register(Section)
 class SectionAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = ['name_en', 'name_ru']
