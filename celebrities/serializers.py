@@ -98,26 +98,21 @@ class CelebrityProfileFullSerializer(CelebrityFeedSerializer):
 
     def get_goals(self, obj):
         queryset = CelebrityGoal.objects.filter(sphere__user=obj)
+        self.context['user'] = obj
         morning_serializer = CelebrityProfileGoalsSerializer(
             queryset.filter(time=constants.TIME_MORNING).order_by('order'),
             many=True,
-            context={
-                'user': obj
-            }
+            context=self.context
         )
         day_serializer = CelebrityProfileGoalsSerializer(
             queryset.filter(time=constants.TIME_DAY).order_by('order'),
             many=True,
-            context={
-                'user': obj
-            }
+            context=self.context
         )
         evening_serializer = CelebrityProfileGoalsSerializer(
             queryset.filter(time=constants.TIME_EVENING).order_by('order'),
             many=True,
-            context={
-                'user': obj
-            }
+            context=self.context
         )
         data = {
             'goals': len(morning_serializer.data) != 0 or len(day_serializer.data) != 0 or len(
