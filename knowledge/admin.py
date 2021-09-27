@@ -11,15 +11,15 @@ class StoryInline(SortableInlineAdminMixin, admin.TabularInline):
     show_change_link = True
 
 
-
-
 @admin.register(Section)
 class SectionAdmin(SortableAdminMixin, admin.ModelAdmin):
-    list_display = ['name_en', 'name_ru']
+    list_display = ['name_en', 'name_ru', 'is_active']
+    list_filter = ['is_active']
     inlines = [StoryInline]
 
 
 @admin.register(Story)
 class StoryAdmin(admin.ModelAdmin):
+    list_display = ['text_en', 'is_active']
     exclude = ['order']
-    list_filter = ['section__name_en']
+    list_filter = ['section__name_en', 'is_active']

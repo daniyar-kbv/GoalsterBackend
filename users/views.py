@@ -369,8 +369,11 @@ class FeedV2ViewSet(FeedViewSet):
             serializer = self.get_serializer(instance)
         except:
             instance = self.get_object(True)
+            context = {
+                'request': request
+            }
             serializer = CelebrityProfileFullSerializer(instance,
-                                                        context=self.get_serializer_context())
+                                                        context=context)
         return Response(serializer.data)
 
     def get_object(self, is_celebrity: bool = False):

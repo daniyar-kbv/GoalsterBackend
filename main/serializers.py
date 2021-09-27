@@ -128,10 +128,6 @@ class GoalAddSerializer(serializers.ModelSerializer):
             )
         goal = Goal.objects.create(**validated_data)
         if validated_data.get('is_shared'):
-            user = self.context.get('user')
-            if not user.is_premium:
-                goal.delete()
-                raise serializers.ValidationError(response.make_messages([_('You have to be premium to add observers')]))
             observer_id = self.context.get('observer')
             try:
                 observer = MainUser.objects.get(id=observer_id)
@@ -151,10 +147,6 @@ class GoalAddSerializer(serializers.ModelSerializer):
         instance.is_shared = validated_data.get('is_shared', instance.is_shared)
         instance.is_public = validated_data.get('is_public', instance.is_public)
         if validated_data.get('is_shared'):
-            user = self.context.get('user')
-            if not user.is_premium:
-                raise serializers.ValidationError(
-                    response.make_messages([_('You have to be premium to add observers')]))
             observer_id = self.context.get('observer')
             try:
                 Observation.objects.get(id=observer_id)
@@ -198,7 +190,11 @@ class AddEmotionSerializer(serializers.Serializer):
         return value
 
     def create(self, validated_data):
-        UserAnswer.objects.filter(user=self.context.get('user')).delete()
+        user = self.context.get('user')
+        if not user.is_premium:
+            raise serializers.ValidationError(
+                response.make_messages([_('You have to be premium to add observers')]))
+        UserAnswer.objects.filter(user=user).delete()
         answers = validated_data.get('answers')
         answer_objects = []
         for answer in answers:
@@ -219,7 +215,11 @@ class VisualizationCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
     def create(self, validated_data):
-        if Visualization.objects.filter(sphere=validated_data.get('sphere'), user=self.context.get('user')).count() == 3:
+        user = self.context.get('user')
+        if not user.is_premium:
+            raise serializers.ValidationError(
+                response.make_messages([_('You have to be premium to add observers')]))
+        if Visualization.objects.filter(sphere=validated_data.get('sphere'), user=user).count() == 3:
             raise serializers.ValidationError(response.make_messages([_('You can not add more than 3 visualizations to one area')]))
         visualization = Visualization.objects.create(**validated_data)
         return visualization

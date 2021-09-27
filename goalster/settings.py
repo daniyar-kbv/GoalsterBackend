@@ -42,7 +42,6 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'django_celery_beat',
-    'dbbackup',
     'django_extensions',
     'adminsortable2',
 
