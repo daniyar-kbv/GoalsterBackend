@@ -10,6 +10,9 @@ class StoryInline(SortableInlineAdminMixin, admin.TabularInline):
     readonly_fields = ['text_en']
     show_change_link = True
 
+    def has_add_permission(self, request, obj):
+        return False
+
 
 @admin.register(Section)
 class SectionAdmin(SortableAdminMixin, admin.ModelAdmin):
