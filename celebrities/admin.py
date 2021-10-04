@@ -46,9 +46,11 @@ class CelebritySphereAdmin(admin.ModelAdmin):
     readonly_fields = ['user']
     exclude = ['order']
     list_filter = ['user__profile__name_en']
-
-    def has_delete_permission(self, request, obj=None):
-        return False
+    actions = None
 
     def has_add_permission(self, request):
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        return not request.path.__contains__('/api/admin/celebrities/celebritysphere/')
+
