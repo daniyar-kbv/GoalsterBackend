@@ -120,32 +120,32 @@ NOTIFICATION_COMMENT_OBSERVER = 5
 NOTIFICATION_RATE = 6
 NOTIFICATION_COMPLETE_GOALS = 7
 
-THREE_DAYS_TITLE_RU = 'Ты 3 дня не заходил в приложение 24Goals.'
-THREE_DAYS_BODY_RU = 'Кликни сюда и я покажу тебе то, для чего ты все начал.'
-BEFORE_END_TITLE_RU = 'Скоро подведение итогов!'
+THREE_DAYS_TITLE_RU = 'Твоим целям нужен ТЫ!'
+THREE_DAYS_BODY_RU = 'Ты 3 дня не заходил к нам. Сейчас - идеальное время.'
+BEFORE_END_TITLE_RU = 'Ура! Скоро подведение итогов!'
 BEFORE_END_BODY_RU = 'Ты готов?'
 END_TITLE_RU = '30 дневный период подходит к концу уже сегодня!'
-END_BODY_RU = 'Кликни сюда и подведи итоги.'
-RATE_TITLE_RU = 'Оцени приложение'
+END_BODY_RU = 'Нажми на меня и подведи итоги.'
+RATE_TITLE_RU = 'Оцените, пожалуйста, ваше впечатление от 24Goals!'
 RATE_BODY_RU = ''
-COMPLETE_GOALS_TITLE_RU = 'Ты не завершил цели на сегодня'
-COMPLETE_GOALS_BODY_RU = 'Вернись и заверши!'
+COMPLETE_GOALS_TITLE_RU = 'Я все вижу!'
+COMPLETE_GOALS_BODY_RU = 'Ты не выполнил все задачи за день. Готов сдаться?'
 
-THREE_DAYS_TITLE_EN = "You haven't opened the 24Goals app in 3 days."
-THREE_DAYS_BODY_EN = "Click here and I'll show you what you started it all for."
-BEFORE_END_TITLE_EN = 'Summing up soon!'
+THREE_DAYS_TITLE_EN = "Your goals need YOU!"
+THREE_DAYS_BODY_EN = "You haven't used us for 3 days. The perfect time is NOW."
+BEFORE_END_TITLE_EN = 'Hooray! Summing up soon!'
 BEFORE_END_BODY_EN = 'Are you ready?'
 END_TITLE_EN = 'The 30-day period is coming to an end today!'
-END_BODY_EN = 'Click here and summarize.'
-RATE_TITLE_EN = 'Rate our app'
+END_BODY_EN = 'Click here and have time to summarize.'
+RATE_TITLE_EN = 'Please rate your experience with 24Goals!'
 RATE_BODY_EN = ''
-COMPLETE_GOALS_TITLE_EN = 'You have not completed tour goals'
-COMPLETE_GOALS_BODY_EN = 'Come back and complete!'
+COMPLETE_GOALS_TITLE_EN = 'I can see everything!'
+COMPLETE_GOALS_BODY_EN = "You didn't complete all the tasks in a day. Are you ready to give up?"
 
-NEW_COMMENT_RU = 'Новый коментарий'
-NEW_COMMENT_EN = 'New comment'
+NEW_COMMENT_RU = 'Вы получили новый комментарий!'
+NEW_COMMENT_EN = 'You have received a new comment!'
 NEW_COMMENT_OBSERVER_RU = 'Ваш наставник оставил комментарий. Скорей заходи.'
-NEW_COMMENT_OBSERVER_EN = 'Your mentor left a comment.'
+NEW_COMMENT_OBSERVER_EN = 'Your mentor left a comment. Come in quickly.'
 
 NOTIFICATION_TYPES = (
     (NOTIFICATION_3DAYS, '3 inactive days'),
