@@ -10,7 +10,7 @@ from main.serializers import ChooseSpheresSerializer, GoalListSerializer, GoalAd
     UserAnswerListSerializer, VisualizationCreateSerializer, \
     VisualizationListSerializer, SelectedSphereSerializer, ObservedListSerializer, ObserversListSerializer, \
     ObservationAcceptSerializer, HelpCreateSerializer, UpdateSpheresSerializer, CommentCreateSerializer, \
-    CommentListSerializer
+    CommentListSerializer, VisualizationCreateSerializerV2, AddEmotionSerializerV2
 from main.tasks import send_email
 from utils import permissions, response, deeplinks, encoding, time, general
 import datetime, constants, PIL, requests
@@ -286,10 +286,22 @@ class VisualizationViewSet(viewsets.GenericViewSet,
         })
 
     def create(self, request, *args, **kwargs):
+        return self.__create(request, VisualizationCreateSerializer)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response()
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def create_v2(self, request, pk=None):
+        return self.__create(request, VisualizationCreateSerializerV2)
+
+    def __create(self, request, serializer_class):
         context = {
             'user': request.user
         }
-        serializer = VisualizationCreateSerializer(data=request.data, context=context)
+        serializer = serializer_class(data=request.data, context=context)
         if serializer.is_valid():
             visualization = serializer.save(user=request.user)
             out_serializer = VisualizationListSerializer([visualization], many=True, context=request)
@@ -300,11 +312,6 @@ class VisualizationViewSet(viewsets.GenericViewSet,
             }
             return Response(data)
         return Response(response.make_errors(serializer), status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response()
 
 
 class EmotionsViewSet(viewsets.GenericViewSet,
@@ -322,10 +329,17 @@ class EmotionsViewSet(viewsets.GenericViewSet,
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def add(self, request, pk=None):
+        return self.__add(request, AddEmotionSerializer)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def add_v2(self, request, pk=None):
+        return self.__add(request, AddEmotionSerializerV2)
+
+    def __add(self, request, serializer_class):
         context = {
             'user': request.user
         }
-        serializer = AddEmotionSerializer(data=request.data, context=context)
+        serializer = serializer_class(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
             return self.list(request)

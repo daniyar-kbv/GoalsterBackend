@@ -291,7 +291,7 @@ msgid "Does not exist"
 msgstr "Не существует"
 
 msgid "You have to be premium to add observers"
-msgstr "Вы должны быть премиум полбзователем что бы добавлять наблюдателей"
+msgstr "Вы должны быть премиум пользователем что бы добавлять наблюдателей"
 
 msgid "Number of answers should be equal to 4"
 msgstr "Количество ответов должно быть равно 4"

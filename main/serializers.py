@@ -191,6 +191,30 @@ class AddEmotionSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = self.context.get('user')
+        UserAnswer.objects.filter(user=user).delete()
+        answers = validated_data.get('answers')
+        answer_objects = []
+        for answer in answers:
+            serializer = UserAnswerAddSerializer(data=answer)
+            if serializer.is_valid():
+                answer_objects.append(serializer.save(user=self.context.get('user')))
+            else:
+                for obj in answer_objects:
+                    obj.delete()
+                raise serializers.ValidationError(response.make_errors(serializer))
+        return answer_objects
+
+
+class AddEmotionSerializerV2(serializers.Serializer):
+    answers = serializers.ListField(child=UserAnswerAddSerializer())
+
+    def validate_answers(self, value):
+        if len(value) != 4:
+            raise serializers.ValidationError(response.make_messages([_('Number of answers should be equal to 4')]))
+        return value
+
+    def create(self, validated_data):
+        user = self.context.get('user')
         if not user.is_premium:
             raise serializers.ValidationError(
                 response.make_messages([_('You have to be premium to add observers')]))
@@ -216,11 +240,26 @@ class VisualizationCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context.get('user')
+        if Visualization.objects.filter(sphere=validated_data.get('sphere'), user=user).count() == 3:
+            raise serializers.ValidationError(response.make_messages([_('You can not add more than 3 visualizations to one area')]))
+        visualization = Visualization.objects.create(**validated_data)
+        return visualization
+
+
+class VisualizationCreateSerializerV2(serializers.ModelSerializer):
+    class Meta:
+        model = Visualization
+        fields = '__all__'
+        read_only_fields = ['user']
+
+    def create(self, validated_data):
+        user = self.context.get('user')
         if not user.is_premium:
             raise serializers.ValidationError(
                 response.make_messages([_('You have to be premium to add observers')]))
         if Visualization.objects.filter(sphere=validated_data.get('sphere'), user=user).count() == 3:
-            raise serializers.ValidationError(response.make_messages([_('You can not add more than 3 visualizations to one area')]))
+            raise serializers.ValidationError(
+                response.make_messages([_('You can not add more than 3 visualizations to one area')]))
         visualization = Visualization.objects.create(**validated_data)
         return visualization
 

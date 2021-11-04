@@ -63,6 +63,7 @@ class MainUserAdmin(admin.ModelAdmin):
     list_filter = ['is_staff', 'is_active']
     ordering = ['-created_at']
     filter_horizontal = ['groups', 'user_permissions']
+    exclude = ['is_celebrity']
 
     def get_form(self, request, obj=None, **kwargs):
         request._obj_ = obj
