@@ -12,7 +12,7 @@ class NonCustomizableNotificationType(models.Model):
     title_en = models.CharField(f"{_('Title')} EN", max_length=100)
     title_ru = models.CharField(f"{_('Title')} RU", max_length=100)
     body_en = models.TextField(f"{_('Body')} EN", null=True, blank=True)
-    body_ru = models.TextField(f"{_('Body')} EN", null=True, blank=True)
+    body_ru = models.TextField(f"{_('Body')} RU", null=True, blank=True)
 
     class Meta:
         verbose_name = _('Non customizable notification type')
@@ -26,7 +26,7 @@ class PeriodicNotification(models.Model):
     title_en = models.CharField(f"{_('Title')} EN", max_length=100)
     title_ru = models.CharField(f"{_('Title')} RU", max_length=100)
     body_en = models.TextField(f"{_('Body')} EN", null=True, blank=True)
-    body_ru = models.TextField(f"{_('Body')} EN", null=True, blank=True)
+    body_ru = models.TextField(f"{_('Body')} RU", null=True, blank=True)
     weekdays = models.ManyToManyField(
         Weekday,
         related_name='notification_types',
@@ -46,7 +46,7 @@ class DisposableNotification(models.Model):
     title_en = models.CharField(f"{_('Title')} EN", max_length=100)
     title_ru = models.CharField(f"{_('Title')} RU", max_length=100)
     body_en = models.TextField(f"{_('Body')} EN", null=True, blank=True)
-    body_ru = models.TextField(f"{_('Body')} EN", null=True, blank=True)
+    body_ru = models.TextField(f"{_('Body')} RU", null=True, blank=True)
 
     class Meta:
         verbose_name = _('Disposable notification')
