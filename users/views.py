@@ -364,7 +364,7 @@ class FeedV2ViewSet(FeedViewSet):
         return Response(serializer_data)
 
     def retrieve(self, request, *args, **kwargs):
-        is_celebrity = bool(request.GET.get('is_celebrity', 0))
+        is_celebrity = bool(int(request.GET.get('is_celebrity', 0)))
         instance = self.get_object(is_celebrity)
         if is_celebrity:
             context = {
