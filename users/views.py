@@ -364,16 +364,16 @@ class FeedV2ViewSet(FeedViewSet):
         return Response(serializer_data)
 
     def retrieve(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object(False)
-            serializer = self.get_serializer(instance)
-        except:
-            instance = self.get_object(True)
+        is_celebrity = request.GET.get('is_celebrity', False)
+        instance = self.get_object(is_celebrity)
+        if is_celebrity:
             context = {
                 'request': request
             }
             serializer = CelebrityProfileFullSerializer(instance,
                                                         context=context)
+        else:
+            serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     def get_object(self, is_celebrity: bool = False):
