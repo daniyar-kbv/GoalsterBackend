@@ -5,8 +5,8 @@ RUN mkdir /goalster/staticfiles
 RUN mkdir /goalster/media
 WORKDIR /goalster
 ADD requirements.txt /goalster/
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip3 install --upgrade pip
+RUN pip3 install -r requirements.txt
 ADD . /goalster/
 
 ENV WAIT_VERSION 2.7.2
